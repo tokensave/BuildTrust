@@ -49,7 +49,7 @@ const submit = () => {
 
         <SettingsLayout>
             <div class="flex flex-col space-y-6">
-                <HeadingSmall title="Информация профиля" description="Обновите ваши данные профиля" />
+                <HeadingSmall title="Информация профиля" />
 
                 <form @submit.prevent="submit" class="space-y-6">
                     <div class="grid gap-2">
