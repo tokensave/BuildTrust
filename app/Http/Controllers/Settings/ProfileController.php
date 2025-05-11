@@ -9,6 +9,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 class ProfileController extends Controller
 {
@@ -21,22 +23,36 @@ class ProfileController extends Controller
         ]);
     }
 
+    /**
+     * @throws FileDoesNotExist
+     * @throws FileIsTooBig
+     */
     public function update(Request $request): RedirectResponse
     {
         $user = $request->user();
-
         $validated = $request->validate([
-            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'username'     => 'nullable|string|max:255|unique:users,username,' . $user->id,
+            'email'        => 'required|email|max:255|unique:users,email,' . $user->id,
             'company_name' => 'nullable|string|max:255',
-            'inn' => 'nullable|string|max:20',
+            'inn'          => 'nullable|string|max:20',
+            'avatar'       => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
         ]);
 
-        $user->email = $validated['email'];
+        if ($request->hasFile('avatar')) {
+            $user->clearMediaCollection('avatar');
 
-        if (isset($validated['username'])) {
-            $user->username = $validated['username'];
+            // сохраняем новый
+            $user
+                ->addMediaFromRequest('avatar')
+                ->usingFileName(uniqid('', true) . '.' . $request->file('avatar')->extension())
+                ->toMediaCollection('avatar');
         }
+
+        // Обновляем остальные поля
+        $user->fill([
+            'username' => $validated['username'] ?? $user->username,
+            'email'    => $validated['email'],
+        ]);
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -44,11 +60,11 @@ class ProfileController extends Controller
 
         $user->save();
 
-        // Обновляем связанную компанию, если пользователь директор и есть компания
-        if ($user->role === 'director' && $user->company) {
+        // Обновляем компанию, если нужно
+        if ($user->isDirector() && $user->company) {
             $user->company->update([
                 'name' => $validated['company_name'] ?? $user->company->name,
-                'inn' => $validated['inn'] ?? $user->company->inn,
+                'inn'  => $validated['inn']          ?? $user->company->inn,
             ]);
         }
 

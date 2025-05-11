@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 import DeleteUser from '@/components/DeleteUser.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -10,6 +11,8 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem, type SharedData, type User } from '@/types';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useInitials } from '@/composables/useInitials';
 
 interface Props {
     mustVerifyEmail: boolean;
@@ -28,17 +31,40 @@ const breadcrumbs: BreadcrumbItem[] = [
 const page = usePage<SharedData>();
 const user = page.props.auth.user as User;
 const company = page.props.company;
+const { getInitials } = useInitials();
 
 const form = useForm({
     username: user.username ?? '',
     email: user.email,
     company_name: company?.name ?? '',
     inn: company?.inn ?? '',
+    avatar:   null as File | null,
 });
 
+const preview = ref<string | null>((user.media?.[0]?.original_url as string) || null);
+
+const handleAvatarChange = (event: Event) => {
+    const file = (event.target as HTMLInputElement)?.files?.[0] || null;
+    form.avatar = file;
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            preview.value = e.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
 const submit = () => {
-    form.patch(route('profile.update'), {
+    console.log('>>> form data:', {
+        email:    form.email,
+        username: form.username,
+        avatar:   form.avatar,
+    });
+    form.post(route('profile.update'), {
         preserveScroll: true,
+        forceFormData: true,
     });
 };
 </script>
@@ -101,6 +127,21 @@ const submit = () => {
                             placeholder="Электронная почта"
                         />
                         <InputError class="mt-2" :message="form.errors.email" />
+                    </div>
+
+                    <div class="grid gap-2">
+                        <Label for="avatar">Аватар</Label>
+                            <div class="flex items-center gap-4">
+                                <Avatar class="size-16">
+                                    <AvatarImage v-if="preview" :src="preview" alt="Аватар" />
+                                    <AvatarFallback>
+                                        {{ getInitials(user.username) }}
+                                    </AvatarFallback>
+                                </Avatar>
+
+                                <Input id="avatar" type="file" accept="image/*" @change="handleAvatarChange" />
+                            </div>
+                        <InputError class="mt-2" :message="form.errors.avatar" />
                     </div>
 
                     <div v-if="mustVerifyEmail && !user.email_verified_at">

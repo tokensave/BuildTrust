@@ -1,7 +1,7 @@
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import path from 'path';
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from "@tailwindcss/vite/dist";
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 

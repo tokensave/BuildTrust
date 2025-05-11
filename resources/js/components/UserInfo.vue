@@ -5,7 +5,7 @@ import type { User } from '@/types';
 import { computed } from 'vue';
 
 interface Props {
-    user: User;
+    user: User & { media: Media[] };
     showEmail?: boolean;
 }
 
@@ -15,13 +15,17 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { getInitials } = useInitials();
 
+const avatarUrl = computed(() => {
+    return props.user.media?.[0]?.original_url || '';
+});
 // Compute whether we should show the avatar image
-const showAvatar = computed(() => props.user.avatar && props.user.avatar !== '');
+const showAvatar = computed(() => avatarUrl.value !== '');
+
 </script>
 
 <template>
     <Avatar class="h-8 w-8 overflow-hidden rounded-lg">
-        <AvatarImage v-if="showAvatar" :src="user.avatar" :alt="user.username" />
+        <AvatarImage v-if="showAvatar" :src="avatarUrl" :alt="user.username" />
         <AvatarFallback class="rounded-lg text-black dark:text-white">
             {{ getInitials(user.username) }}
         </AvatarFallback>
