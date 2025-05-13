@@ -38,6 +38,11 @@ const form = useForm({
     email: user.email,
     company_name: company?.name ?? '',
     inn: company?.inn ?? '',
+    phone: company?.phone ?? '',
+    city: company?.city ?? '',
+    address: company?.address ?? '',
+    website: company?.website ?? '',
+    verified: company?.verified ?? '',
     avatar:   null as File | null,
 });
 
@@ -57,11 +62,6 @@ const handleAvatarChange = (event: Event) => {
 };
 
 const submit = () => {
-    console.log('>>> form data:', {
-        email:    form.email,
-        username: form.username,
-        avatar:   form.avatar,
-    });
     form.post(route('profile.update'), {
         preserveScroll: true,
         forceFormData: true,
@@ -77,7 +77,40 @@ const submit = () => {
             <div class="flex flex-col space-y-6">
                 <HeadingSmall title="Информация профиля" />
 
-                <form @submit.prevent="submit" class="space-y-6">
+                <div class="grid gap-2 md:col-span-2">
+                    <Label for="verified">Статус компании</Label>
+                    <div class="flex items-center gap-2">
+                        <span>{{ form.verified ? 'Подтверждена' : 'Не подтверждена' }}</span>
+                        <svg
+                            v-if="form.verified"
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 text-green-500"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414L8.414 15 4.707 11.293a1 1 0 111.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
+                        <svg
+                            v-else
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 text-gray-400"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-4.586l-3.293-3.293a1 1 0 111.414-1.414L9 11.586l4.293-4.293a1 1 0 011.414 1.414l-5 5a1 1 0 01-1.414 0z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
+                    </div>
+                </div>
+
+                <form @submit.prevent="submit" class="grid gap-6 md:grid-cols-2">
                     <div class="grid gap-2">
                         <Label for="username">Логин</Label>
                         <Input
@@ -97,7 +130,6 @@ const submit = () => {
                             id="company_name"
                             class="mt-1 block w-full"
                             v-model="form.company_name"
-                            :disabled="user.role !== 'director'"
                             placeholder="Название вашей компании"
                         />
                         <InputError class="mt-2" :message="form.errors.company_name" />
@@ -109,10 +141,20 @@ const submit = () => {
                             id="inn"
                             class="mt-1 block w-full"
                             v-model="form.inn"
-                            :disabled="user.role !== 'director'"
                             placeholder="ИНН вашей компании"
                         />
                         <InputError class="mt-2" :message="form.errors.inn" />
+                    </div>
+
+                    <div v-if="user.role === 'director'" class="grid gap-2">
+                        <Label for="phone">Номер телефона</Label>
+                        <Input
+                            id="phone"
+                            class="mt-1 block w-full"
+                            v-model="form.phone"
+                            placeholder="Номер телефона вашей компании"
+                        />
+                        <InputError class="mt-2" :message="form.errors.phone" />
                     </div>
 
                     <div class="grid gap-2">
@@ -130,21 +172,54 @@ const submit = () => {
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="avatar">Аватар</Label>
-                            <div class="flex items-center gap-4">
-                                <Avatar class="size-16">
-                                    <AvatarImage v-if="preview" :src="preview" alt="Аватар" />
-                                    <AvatarFallback>
-                                        {{ getInitials(user.username) }}
-                                    </AvatarFallback>
-                                </Avatar>
+                        <Label for="city">Город</Label>
+                        <Input
+                            id="city"
+                            class="mt-1 block w-full"
+                            v-model="form.city"
+                            placeholder="Город вашей компании"
+                        />
+                        <InputError class="mt-2" :message="form.errors.city" />
+                    </div>
 
-                                <Input id="avatar" type="file" accept="image/*" @change="handleAvatarChange" />
-                            </div>
+                    <div class="grid gap-2">
+                        <Label for="address">Адрес</Label>
+                        <Input
+                            id="address"
+                            class="mt-1 block w-full"
+                            v-model="form.address"
+                            placeholder="Адрес вашей компании"
+                        />
+                        <InputError class="mt-2" :message="form.errors.address" />
+                    </div>
+
+                    <div class="grid gap-2">
+                        <Label for="website">Сайт</Label>
+                        <Input
+                            id="website"
+                            class="mt-1 block w-full"
+                            v-model="form.website"
+                            placeholder="Веб-сайт вашей компании"
+                        />
+                        <InputError class="mt-2" :message="form.errors.website" />
+                    </div>
+
+                    <div class="grid gap-2 md:col-span-2">
+                        <Label for="avatar">Аватар</Label>
+                        <div class="flex items-center gap-4">
+                            <Avatar class="size-16">
+                                <AvatarImage v-if="preview" :src="preview" alt="Аватар" />
+                                <AvatarFallback>
+                                    {{ getInitials(user.username) }}
+                                </AvatarFallback>
+                            </Avatar>
+                            <Input id="avatar" type="file" accept="image/*" @change="handleAvatarChange" />
+                        </div>
                         <InputError class="mt-2" :message="form.errors.avatar" />
                     </div>
 
-                    <div v-if="mustVerifyEmail && !user.email_verified_at">
+
+                    <div v-if="mustVerifyEmail && !user.email_verified_at" class="md:col-span-2">
                         <p class="-mt-4 text-sm text-muted-foreground">
                             Ваша почта не подтверждена.
                             <Link
@@ -162,7 +237,7 @@ const submit = () => {
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 md:col-span-2">
                         <Button :disabled="form.processing">Сохранить</Button>
 
                         <Transition
@@ -181,3 +256,5 @@ const submit = () => {
         </SettingsLayout>
     </AppLayout>
 </template>
+
+
