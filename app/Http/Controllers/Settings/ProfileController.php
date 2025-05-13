@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\DTO\UserSetting\UserProfileData;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Services\User\UserProfileService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 class ProfileController extends Controller
 {
@@ -21,36 +26,15 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    /**
+     * @throws FileIsTooBig
+     * @throws FileDoesNotExist
+     */
+    public function update(ProfileUpdateRequest $request, UserProfileService $service): RedirectResponse
     {
-        $user = $request->user();
+        $data = UserProfileData::fromRequest($request);
 
-        $validated = $request->validate([
-            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'company_name' => 'nullable|string|max:255',
-            'inn' => 'nullable|string|max:20',
-        ]);
-
-        $user->email = $validated['email'];
-
-        if (isset($validated['username'])) {
-            $user->username = $validated['username'];
-        }
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
-        $user->save();
-
-        // Обновляем связанную компанию, если пользователь директор и есть компания
-        if ($user->role === 'director' && $user->company) {
-            $user->company->update([
-                'name' => $validated['company_name'] ?? $user->company->name,
-                'inn' => $validated['inn'] ?? $user->company->inn,
-            ]);
-        }
+        $service->update($request->user(), $data);
 
         return to_route('profile.edit')->with('status', 'profile-updated');
     }
