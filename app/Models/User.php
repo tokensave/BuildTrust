@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -68,6 +69,11 @@ class User extends Authenticatable implements HasMedia
     public function isManager(): bool
     {
         return $this->role === 'manager';
+    }
+
+    public function ads(): HasMany
+    {
+        return $this->hasMany(Ads::class);
     }
     public function registerMediaCollections(): void
     {
