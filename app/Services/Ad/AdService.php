@@ -8,6 +8,7 @@ namespace App\Services\Ad;
 use App\DTO\Ads\AdData;
 use App\Models\Ads;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
@@ -52,6 +53,11 @@ class AdService
         }
 
         return $ad;
+    }
+
+    public function delete(Ads $ad): void
+    {
+        $ad->clearMediaCollection('images')->delete(); // Если нужно, можно добавить удаление медиа и прочее
     }
 
     /**

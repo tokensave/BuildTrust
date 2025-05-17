@@ -45,11 +45,21 @@ function statusColorClass(status: string): string {
     }
 }
 
+// Удаление объявления
 function deleteAd() {
     if (confirm('Вы уверены, что хотите удалить объявление?')) {
-        router.delete(route('user.ads.destroy', [props.ad.user_id, props.ad.id]));
+        router.delete(route('user.ads.destroy', [props.ad.user_id, props.ad.id]), {
+            preserveScroll: true,
+            onSuccess: () => {
+                // Заново запрашиваем страницу (перезагрузка)
+                router.reload({
+                    only: ['ads'], // Только `ads` из props
+                });
+            }
+        });
     }
 }
+
 </script>
 
 <template>
@@ -87,7 +97,7 @@ function deleteAd() {
                 class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-end text-white"
             >
                 <CardTitle>{{ props.ad.title }}</CardTitle>
-                <CardDescription>{{ props.ad.description }}</CardDescription>
+                <CardDescription class="text-gray-200">{{ props.ad.description }}</CardDescription>
             </div>
         </Link>
     </Card>
