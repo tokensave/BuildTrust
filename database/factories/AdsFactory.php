@@ -2,17 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Enums\AdEnums\AdsStatusEnum;
-use App\Models\Ads;
+use App\Models\Ad;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Ads>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Ad>
  */
 class AdsFactory extends Factory
 {
-    protected $model = Ads::class;
+    protected $model = Ad::class;
     public function definition(): array
     {
         return [

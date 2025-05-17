@@ -15,7 +15,7 @@ Route::middleware(['auth'])
         Route::post('/', [UserAdsController::class, 'store'])->name('store');
         Route::get('/{ad}', [UserAdsController::class, 'show'])->name('show');
         Route::get('/{ad}/edit', [UserAdsController::class, 'edit'])->name('edit');
-        Route::put('/{ad}', [UserAdsController::class, 'update'])->name('update');
+        Route::post('/{ad}', [UserAdsController::class, 'update'])->name('update');
         Route::delete('/{ad}', [UserAdsController::class, 'destroy'])->name('destroy');
     });
 

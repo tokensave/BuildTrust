@@ -6,7 +6,7 @@ use App\Enums\AdEnums\AdsStatusEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreAdsRequest extends FormRequest
+class StoreAdRequest extends FormRequest
 {
     public function authorize(): bool
     {

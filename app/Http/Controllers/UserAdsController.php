@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\DTO\Ads\AdData;
-use App\Http\Requests\Ad\StoreAdsRequest;
-use App\Models\Ads;
+use App\Http\Requests\Ad\StoreAdRequest;
+use App\Http\Requests\Ad\UpdateAdRequest;
+use App\Models\Ad;
 use App\Models\User;
 use App\Services\Ad\AdService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
@@ -48,7 +47,7 @@ class UserAdsController extends Controller
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
-    public function store(StoreAdsRequest $request, AdService $service): RedirectResponse
+    public function store(StoreAdRequest $request, AdService $service): RedirectResponse
     {
         $data = AdData::fromRequest($request);
         $ad = $service->create($request->user(), $data);
@@ -57,8 +56,32 @@ class UserAdsController extends Controller
             ->with('success', 'Объявление успешно создано');
     }
 
-//    public function edit
-    public function destroy(int $user, Ads $ad, AdService $service)
+    public function edit(int $user, int $adId): Response
+    {
+        $ad = Ad::with('media')->findOrFail($adId);
+
+        return Inertia::render('ads/userAds/Edit', [
+            'auth' => [
+                'user' => auth()->user(),
+            ],
+            'ad' => $ad,
+        ]);
+    }
+
+    /**
+     * @throws FileDoesNotExist
+     * @throws FileIsTooBig
+     */
+    public function update(UpdateAdRequest $request, int $user, Ad $ad, AdService $service): RedirectResponse
+    {
+        $data = AdData::fromRequest($request);
+
+        $service->update($ad, $data);
+
+        return to_route('user.ads.index', $user)
+            ->with('success', 'Объявление успешно обновлено');
+    }
+    public function destroy(int $user, Ad $ad, AdService $service)
     {
         $service->delete($ad);
 

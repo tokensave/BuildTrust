@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { useForm, usePage } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent} from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { type User, type SharedData, type BreadcrumbItem } from '@/types';
-import { ref, watch } from 'vue';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ref, watch } from 'vue';
 import { Textarea } from '@/components/ui/textarea';
+import type { SharedData, Ad, BreadcrumbItem, User } from '@/types';
 
-
-const page = usePage<SharedData>();
+const page = usePage<SharedData & { ad: Ad }>();
 const user = page.props.auth.user as User;
+const ad = page.props.ad;
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,12 +25,11 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('user.ads.index', user.id),
     },
     {
-        title: 'Новое объявление',
-        href: route('user.ads.create', user.id), // текущая страница
+        title: 'Редактировать объявление',
+        href: route('user.ads.edit', [user.id, ad.id]),
     },
 ];
 
-// Возможные статусы
 const statusOptions = [
     { value: 'draft', label: 'Черновик' },
     { value: 'published', label: 'Опубликовано' },
@@ -38,14 +37,16 @@ const statusOptions = [
 ];
 
 const form = useForm({
-    title: '',
-    description: '',
-    price: null as number | null,
-    status: '',
+    title: ad.title,
+    description: ad.description,
+    price: ad.price,
+    status: ad.status,
     images: [] as File[],
 });
 
-const previews = ref<string[]>([]);
+const previews = ref<string[]>(
+    ad.media?.map((m: any) => m.original_url) ?? []
+);
 
 const handleImagesChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -58,14 +59,20 @@ const handleImagesChange = (event: Event) => {
 watch(() => form.images, (newImages, oldImages) => {
     oldImages?.forEach(file => URL.revokeObjectURL(file as any));
 });
+
+const handleSubmit = () => {
+    form.post(route('user.ads.update', [ad.user_id, ad.id]), {
+        forceFormData: true,
+    });
+};
 </script>
 
 <template>
-    <AppLayout  :breadcrumbs="breadcrumbs">
+    <AppLayout :breadcrumbs="breadcrumbs">
         <div class="p-4">
             <Card>
                 <CardContent class="space-y-4">
-                    <form @submit.prevent="form.post(route('user.ads.store', user.id), { forceFormData: true })" class="space-y-4">
+                    <form @submit.prevent="handleSubmit" class="space-y-4">
                         <div>
                             <Label for="title" class="block text-sm font-medium mb-1">Заголовок</Label>
                             <Input id="title" v-model="form.title" type="text" required />
@@ -79,7 +86,7 @@ watch(() => form.images, (newImages, oldImages) => {
                         <div class="flex gap-4">
                             <div class="flex-1">
                                 <Label for="price" class="block text-sm font-medium mb-1">Цена</Label>
-                                <Input id="price" v-model="form.price" type="number" step="0.01" min="0" />
+                                <Input id="price" v-model="form.price" type="number" step="0.01" />
                             </div>
 
                             <div class="flex-1">
@@ -90,10 +97,10 @@ watch(() => form.images, (newImages, oldImages) => {
                                     </SelectTrigger>
                                     <SelectContent class="w-full">
                                         <SelectItem
-                                            class="w-full border rounded px-3 py-2 text-sm"
                                             v-for="option in statusOptions"
                                             :key="option.value"
                                             :value="option.value"
+                                            class="w-full border rounded px-3 py-2 text-sm"
                                         >
                                             {{ option.label }}
                                         </SelectItem>
@@ -102,34 +109,21 @@ watch(() => form.images, (newImages, oldImages) => {
                             </div>
                         </div>
 
-
                         <div>
                             <Label for="images" class="block text-sm font-medium mb-1">Изображения</Label>
-                            <Input
-                                id="images"
-                                type="file"
-                                multiple
-                                accept="image/*"
-                                @change="handleImagesChange"
-                            />
+                            <Input id="images" type="file" multiple accept="image/*" @change="handleImagesChange" />
                             <div v-if="previews.length" class="flex gap-2 mt-2 flex-wrap">
-                                <Avatar
-                                    v-for="(src, index) in previews"
-                                    :key="index"
-                                    class="size-16"
-                                >
-                                    <AvatarImage :src="src" alt="Превью" />
+                                <Avatar v-for="(src, i) in previews" :key="i" class="size-16">
+                                    <AvatarImage :src="src" />
                                     <AvatarFallback>IMG</AvatarFallback>
                                 </Avatar>
                             </div>
                         </div>
 
-                        <Button type="submit" :disabled="form.processing">Создать</Button>
+                        <Button type="submit" :disabled="form.processing">Сохранить</Button>
                     </form>
                 </CardContent>
             </Card>
         </div>
     </AppLayout>
 </template>
-
-

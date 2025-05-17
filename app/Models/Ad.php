@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Ads extends Model implements HasMedia
+class Ad extends Model implements HasMedia
 {
     use HasFactory, SoftDeletes, InteractsWithMedia;
 
@@ -20,7 +20,7 @@ class Ads extends Model implements HasMedia
         'description',
         'price',
         'slug',
-        'status',
+        'status'
     ];
 
     protected $casts = [

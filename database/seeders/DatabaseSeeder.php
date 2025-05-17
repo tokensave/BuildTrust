@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Ads;
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Ad;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,6 +12,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Ads::factory()->count(10)->create();
+        Ad::factory()->count(10)->create();
     }
 }

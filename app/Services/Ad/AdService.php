@@ -6,9 +6,8 @@ declare(ticks=1000);
 namespace App\Services\Ad;
 
 use App\DTO\Ads\AdData;
-use App\Models\Ads;
+use App\Models\Ad;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
@@ -19,7 +18,7 @@ class AdService
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
-    public function create(User $user, AdData $data): Ads
+    public function create(User $user, AdData $data): Ad
     {
         $ad = $user->ads()->create([
             'title'       => $data->title,
@@ -38,7 +37,7 @@ class AdService
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
-    public function update(Ads $ad, AdData $data): Ads
+    public function update(Ad $ad, AdData $data): Ad
     {
         $ad->update([
             'title'       => $data->title,
@@ -55,7 +54,7 @@ class AdService
         return $ad;
     }
 
-    public function delete(Ads $ad): void
+    public function delete(Ad $ad): void
     {
         $ad->clearMediaCollection('images')->delete(); // Если нужно, можно добавить удаление медиа и прочее
     }
@@ -64,7 +63,7 @@ class AdService
      * @throws FileIsTooBig
      * @throws FileDoesNotExist
      */
-    protected function saveImages(Ads $ad, ?array $images): void
+    protected function saveImages(Ad $ad, ?array $images): void
     {
         if (! $images) {
             return;

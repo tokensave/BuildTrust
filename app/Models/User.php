@@ -73,7 +73,7 @@ class User extends Authenticatable implements HasMedia
 
     public function ads(): HasMany
     {
-        return $this->hasMany(Ads::class);
+        return $this->hasMany(Ad::class);
     }
     public function registerMediaCollections(): void
     {
