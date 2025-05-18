@@ -8,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { Ad, BreadcrumbItem, SharedData, User } from '@/types';
 import { useForm, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
 import ImagePreviewUploader from '@/components/ImagePreviewUploader.vue';
 
 const page = usePage<SharedData & { ad: Ad }>();
