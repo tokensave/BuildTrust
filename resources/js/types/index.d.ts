@@ -36,4 +36,17 @@ export interface User {
     avatar_url: string;
 }
 
+export interface Ad {
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    slug: string;
+    status: string;
+    user_id: number;
+    media?: {
+        original_url: string;
+    }[];
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;
