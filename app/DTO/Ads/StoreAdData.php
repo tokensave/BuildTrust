@@ -15,7 +15,7 @@ class StoreAdData extends Data
         public string $title,
         public string $description,
         public ?float $price,
-        public string $status,
+        public ?string $status,
         /** @var UploadedFile[]|null */
         public ?array $images,
     ) {

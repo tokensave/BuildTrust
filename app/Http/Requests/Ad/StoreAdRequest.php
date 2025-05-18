@@ -13,13 +13,22 @@ class StoreAdRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->input('status') === null) {
+            $this->merge([
+                'status' => AdsStatusEnum::DRAFT->value,
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [
             'title'       => 'required|string|max:255',
             'description' => 'required|string',
             'price'       => 'nullable|numeric|min:0',
-            'status'      => ['required', Rule::enum(AdsStatusEnum::class)],
+            'status'      => ['nullable', Rule::enum(AdsStatusEnum::class)],
             'images.*'    => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
         ];
     }

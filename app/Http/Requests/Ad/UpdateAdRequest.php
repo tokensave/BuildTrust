@@ -8,12 +8,10 @@ use Illuminate\Validation\Rule;
 
 class UpdateAdRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
     }
-
 
     public function rules(): array
     {

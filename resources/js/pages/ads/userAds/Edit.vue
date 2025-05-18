@@ -9,6 +9,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import type { Ad, BreadcrumbItem, SharedData, User } from '@/types';
 import { useForm, usePage } from '@inertiajs/vue3';
 import ImagePreviewUploader from '@/components/ImagePreviewUploader.vue';
+import InputError from '@/components/InputError.vue';
 
 const page = usePage<SharedData & { ad: Ad }>();
 const user = page.props.auth.user as User;
@@ -51,17 +52,20 @@ const handleSubmit = () => {
                         <div>
                             <Label for="title" class="mb-1 block text-sm font-medium">Заголовок</Label>
                             <Input id="title" v-model="form.title" type="text" required />
+                            <InputError :message="form.errors.title" />
                         </div>
 
                         <div>
                             <Label for="description" class="mb-1 block text-sm font-medium">Описание</Label>
                             <Textarea id="description" v-model="form.description" type="text" />
+                            <InputError :message="form.errors.description" />
                         </div>
 
                         <div class="flex gap-4">
                             <div class="flex-1">
                                 <Label for="price" class="mb-1 block text-sm font-medium">Цена</Label>
                                 <Input id="price" v-model="form.price" type="number" step="0.01" />
+                                <InputError :message="form.errors.price" />
                             </div>
 
                             <div class="flex-1">
