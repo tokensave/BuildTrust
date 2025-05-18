@@ -235,7 +235,7 @@ onBeforeUnmount(() => {
                 :src="currentImageSrc"
                 class="max-w-[90vw] max-h-[90vh] rounded shadow-lg"
                 @click.stop
-            />
+             alt="Изображение обьявления"/>
             <button
                 v-if="modalIndex > 0"
                 class="absolute left-4 text-white text-3xl font-bold bg-black/50 px-2 py-1 rounded"
