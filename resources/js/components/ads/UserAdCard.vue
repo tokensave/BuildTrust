@@ -1,11 +1,7 @@
 <!-- src/components/UserAdCard.vue -->
 <script setup lang="ts">
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Link, router } from '@inertiajs/vue3';
-import {
-    Card,
-    CardTitle,
-    CardDescription,
-} from '@/components/ui/card';
 import { Trash2 } from 'lucide-vue-next';
 
 const props = defineProps<{
@@ -55,51 +51,31 @@ function deleteAd() {
                 router.reload({
                     only: ['ads'], // Только `ads` из props
                 });
-            }
+            },
         });
     }
 }
-
 </script>
 
 <template>
-    <Card class="overflow-hidden group p-0 relative">
-        <button
-            @click.stop="deleteAd"
-            class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-            title="Удалить"
-        >
-            <Trash2 class="w-4 h-4 text-red-600" />
+    <Card class="group relative overflow-hidden p-0">
+        <button @click.stop="deleteAd" class="absolute top-2 right-2 z-10 opacity-0 transition-opacity group-hover:opacity-100" title="Удалить">
+            <Trash2 class="h-4 w-4 text-red-600" />
         </button>
 
-        <Link
-            :href="route('user.ads.edit', [props.ad.user_id, props.ad.id])"
-            class="block relative"
-        >
-            <img
-                :src="props.ad.image_url"
-                alt="Preview"
-                class="object-cover w-full h-48 transition-transform duration-300 group-hover:scale-105"
-            />
+        <Link :href="route('user.ads.edit', [props.ad.user_id, props.ad.id])" class="relative block">
+            <img :src="props.ad.image_url" alt="Preview" class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105" />
 
             <!-- Статус -->
-            <div
-                :class="[
-          'absolute top-2 left-2 text-xs font-semibold rounded px-2 py-1 shadow z-10',
-          statusColorClass(props.ad.status),
-        ]"
-            >
+            <div :class="['absolute top-2 left-2 z-10 rounded px-2 py-1 text-xs font-semibold shadow', statusColorClass(props.ad.status)]">
                 {{ statusLabel(props.ad.status) }}
             </div>
 
             <!-- Текст -->
-            <div
-                class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-end text-white"
-            >
+            <div class="absolute inset-0 flex flex-col justify-end bg-black/50 p-4 text-white opacity-0 transition-opacity group-hover:opacity-100">
                 <CardTitle>{{ props.ad.title }}</CardTitle>
                 <CardDescription class="text-gray-200">{{ props.ad.description }}</CardDescription>
             </div>
         </Link>
     </Card>
 </template>
-

@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Ads\AdData;
+use App\DTO\Ads\StoreAdData;
+use App\DTO\Ads\UpdateAdData;
 use App\Http\Requests\Ad\StoreAdRequest;
 use App\Http\Requests\Ad\UpdateAdRequest;
 use App\Models\Ad;
@@ -49,7 +50,7 @@ class UserAdsController extends Controller
      */
     public function store(StoreAdRequest $request, AdService $service): RedirectResponse
     {
-        $data = AdData::fromRequest($request);
+        $data = StoreAdData::fromRequest($request);
         $ad = $service->create($request->user(), $data);
 
         return to_route('user.ads.store', [$request->user()->id, $ad->id])
@@ -74,7 +75,7 @@ class UserAdsController extends Controller
      */
     public function update(UpdateAdRequest $request, int $user, Ad $ad, AdService $service): RedirectResponse
     {
-        $data = AdData::fromRequest($request);
+        $data = UpdateAdData::fromRequest($request);
 
         $service->update($ad, $data);
 

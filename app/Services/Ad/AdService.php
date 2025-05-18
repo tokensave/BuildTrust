@@ -5,7 +5,8 @@ declare(ticks=1000);
 
 namespace App\Services\Ad;
 
-use App\DTO\Ads\AdData;
+use App\DTO\Ads\StoreAdData;
+use App\DTO\Ads\UpdateAdData;
 use App\Models\Ad;
 use App\Models\User;
 use Illuminate\Support\Str;
@@ -18,7 +19,7 @@ class AdService
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
-    public function create(User $user, AdData $data): Ad
+    public function create(User $user, StoreAdData $data): Ad
     {
         $ad = $user->ads()->create([
             'title'       => $data->title,
@@ -37,7 +38,7 @@ class AdService
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
-    public function update(Ad $ad, AdData $data): Ad
+    public function update(Ad $ad, UpdateAdData $data): Ad
     {
         $ad->update([
             'title'       => $data->title,
@@ -46,13 +47,25 @@ class AdService
             'status'      => $data->status,
         ]);
 
-        if ($data->images) {
-            $ad->clearMediaCollection('images');
-            $this->saveImages($ad, $data->images);
+        // Удаляем только указанные изображения
+        if (!empty($data->deletedMediaIds)) {
+            $ad->media()
+                ->whereIn('id', $data->deletedMediaIds)
+                ->each(fn ($media) => $media->delete());
+        }
+
+        // Добавляем новые изображения
+        if (!empty($data->newImages)) {
+            foreach ($data->newImages as $file) {
+                $ad->addMedia($file)
+                    ->usingFileName(uniqid('', true) . '.' . $file->extension())
+                    ->toMediaCollection('images');
+            }
         }
 
         return $ad;
     }
+
 
     public function delete(Ad $ad): void
     {

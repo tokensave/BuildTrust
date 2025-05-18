@@ -11,14 +11,8 @@ const user = page.props.auth.user as User;
 const ads = page.props.ads;
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Главная',
-        href: '/dashboard',
-    },
-    {
-        title: 'Мои объявления',
-        href: route('user.ads.index', user.id),
-    },
+    { title: 'Главная', href: '/dashboard', },
+    { title: 'Мои объявления', href: route('user.ads.index', user.id), },
 ];
 </script>
 

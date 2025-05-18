@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Spatie\LaravelData\Data;
 
-class AdData extends Data
+class UpdateAdData extends Data
 {
     public function __construct(
         public string $title,
@@ -17,7 +17,9 @@ class AdData extends Data
         public ?float $price,
         public string $status,
         /** @var UploadedFile[]|null */
-        public ?array $images,
+        public ?array $newImages = null,
+        /** @var array<int>|null Удаляемые media IDs */
+        public ?array $deletedMediaIds = null,
     ) {
     }
 
@@ -25,7 +27,8 @@ class AdData extends Data
     {
         return self::from([
             ...$request->validated(),
-            'images' => $request->file('images'),
+            'newImages' => $request->file('images'),
+            'deletedMediaIds' => $request->input('deleted_media_ids', []),
         ]);
     }
 }
