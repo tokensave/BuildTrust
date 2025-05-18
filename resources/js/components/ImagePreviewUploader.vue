@@ -166,6 +166,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
     window.removeEventListener('keydown', handleKeydown);
 });
+
 </script>
 
 <template>
