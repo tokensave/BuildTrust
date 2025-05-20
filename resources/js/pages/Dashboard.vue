@@ -62,13 +62,13 @@ const prevImage = () => {
                         <TableCell>
                             <div
                                 class="font-semibold cursor-pointer hover:underline"
-                                @click="$inertia.visit(route('user.ads.edit', [ad.user_id, ad.id]))"
+                                @click="$inertia.visit(route('user.ads.show', [ad.user_id, ad.id]))"
                             >
                                 {{ ad.title }}
                             </div>
                             <div
                                 class="text-sm text-muted-foreground cursor-pointer hover:underline"
-                                @click="$inertia.visit(route('user.ads.edit', [ad.user_id, ad.id]))"
+                                @click="$inertia.visit(route('user.ads.show', [ad.user_id, ad.id]))"
                             >
                                 {{ ad.description }}
                             </div>

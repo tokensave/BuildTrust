@@ -35,6 +35,18 @@ class UserAdsController extends Controller
         ]);
     }
 
+    public function show(int $user, int $adId): Response
+    {
+        $ad = Ad::with('media', 'user.company')->findOrFail($adId);
+
+        return Inertia::render('ads/userAds/Show', [
+            'auth' => [
+                'user' => auth()->user(),
+            ],
+            'ad' => $ad,
+        ]);
+    }
+
     public function create(int $user): Response
     {
         return Inertia::render('ads/userAds/Create', [
