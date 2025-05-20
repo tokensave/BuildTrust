@@ -6,10 +6,11 @@ use App\Enums\AdEnums\AdsStatusEnum;
 use App\Models\Ad;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class MainController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $ads = Ad::with('media')
             ->where('status', AdsStatusEnum::PUBLISHED->value)
