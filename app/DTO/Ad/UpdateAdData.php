@@ -3,21 +3,23 @@
 declare(strict_types=1);
 declare(ticks=1000);
 
-namespace App\DTO\Ads;
+namespace App\DTO\Ad;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Spatie\LaravelData\Data;
 
-class StoreAdData extends Data
+class UpdateAdData extends Data
 {
     public function __construct(
         public string $title,
         public string $description,
         public ?float $price,
-        public ?string $status,
+        public string $status,
         /** @var UploadedFile[]|null */
-        public ?array $images,
+        public ?array $newImages = null,
+        /** @var array<int>|null Удаляемые media IDs */
+        public ?array $deletedMediaIds = null,
     ) {
     }
 
@@ -25,7 +27,8 @@ class StoreAdData extends Data
     {
         return self::from([
             ...$request->validated(),
-            'images' => $request->file('images'),
+            'newImages' => $request->file('images'),
+            'deletedMediaIds' => $request->input('deleted_media_ids', []),
         ]);
     }
 }

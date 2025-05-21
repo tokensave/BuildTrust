@@ -5,8 +5,8 @@ declare(ticks=1000);
 
 namespace App\Services\Ad;
 
-use App\DTO\Ads\StoreAdData;
-use App\DTO\Ads\UpdateAdData;
+use App\DTO\Ad\StoreAdData;
+use App\DTO\Ad\UpdateAdData;
 use App\Models\Ad;
 use App\Models\User;
 use Illuminate\Support\Str;

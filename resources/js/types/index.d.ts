@@ -66,5 +66,18 @@ export interface Company {
     verified: boolean;
 }
 
+export interface Deal {
+    id: number;
+    ad_id: number;
+    buyer_id: number;
+    seller_id: number;
+    price: number;
+    notes?: string;
+    status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'canceled';
+    created_at: string;
+    documents_urls?: string[];
+}
+
+
 
 export type BreadcrumbItemType = BreadcrumbItem;

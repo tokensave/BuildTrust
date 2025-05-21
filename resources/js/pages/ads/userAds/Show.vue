@@ -5,11 +5,20 @@ import type { Ad, Company, User } from '@/types';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import AdGalleryModal from '@/components/AdGalleryModal.vue';
 import CompanyCard from '@/components/company/CompanyCard.vue';
+import DealCreateModal from '@/components/deal/DealCreateModal.vue';
+import { Button } from '@/components/ui/button'; // 👈
+import { Handshake } from 'lucide-vue-next';
 
 const page = usePage<{ ad: Ad & { user: User & { company?: Company } } }>();
 const ad = page.props.ad;
 const company = ad.user?.company;
 
+// Модалка для сделки
+const isDealModalOpen = ref(false);
+const openDealModal = () => isDealModalOpen.value = true;
+const closeDealModal = () => isDealModalOpen.value = false;
+
+// Модалка галереи
 const modalIndex = ref<number | null>(null);
 const modalImages = ref<string[]>([]);
 const isModalOpen = ref(false);
@@ -51,22 +60,30 @@ onMounted(() => {
 onBeforeUnmount(() => {
     window.removeEventListener('keydown', handleKeydown);
 });
-
 </script>
 
 <template>
-
     <AppLayout :breadcrumbs="[
         { title: 'Главная', href: route('dashboard') },
         { title: ad.title, href: '#' }
     ]">
-        <div class="p-6 space-y-4">
+        <div class="p-6 space-y-6">
 
-            <h1 class="text-2xl font-bold">{{ ad.title }}</h1>
-            <div class="text-muted-foreground">{{ ad.description }}</div>
-            <div class="text-xl font-semibold">{{ ad.price }} ₽</div>
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold">{{ ad.title }}</h1>
+                    <div class="text-muted-foreground">{{ ad.description }}</div>
+                    <div class="text-xl font-semibold mt-2">{{ ad.price }} ₽</div>
+                </div>
 
-            <div class="flex flex-wrap gap-4 mt-4">
+                <Button
+                    @click="openDealModal"
+                >
+                    <Handshake  /> Предложить сделку
+                </Button>
+            </div>
+
+            <div class="flex flex-wrap gap-4">
                 <img
                     v-for="(image, index) in ad.media"
                     :key="image.id"
@@ -77,14 +94,14 @@ onBeforeUnmount(() => {
                 />
             </div>
 
-            <!-- 👇 Блок с компанией -->
+            <!-- Информация о компании -->
             <div v-if="company" class="mt-12">
                 <h2 class="text-2xl font-semibold mb-4">Информация о компании</h2>
                 <CompanyCard :company="company" :user="ad.user" />
             </div>
-
         </div>
 
+        <!-- Компоненты-модалки -->
         <AdGalleryModal
             :images="modalImages"
             :index="modalIndex"
@@ -92,6 +109,13 @@ onBeforeUnmount(() => {
             @next="nextImage"
             @prev="prevImage"
         />
+
+        <DealCreateModal
+            :open="isDealModalOpen"
+            :ad-id="ad.id"
+            :price="ad.price"
+            :seller-id="ad.user.id"
+            :onClose="closeDealModal"
+        />
     </AppLayout>
 </template>
-

@@ -75,6 +75,17 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany(Ad::class);
     }
+
+    public function dealsAsBuyer(): HasMany
+    {
+        return $this->hasMany(Deal::class, 'buyer_id');
+    }
+
+    public function dealsAsSeller(): HasMany
+    {
+        return $this->hasMany(Deal::class, 'seller_id');
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('avatar')
