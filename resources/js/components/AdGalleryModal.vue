@@ -22,6 +22,7 @@ const currentImage = computed(() =>
     <div
         v-if="isModalOpen"
         class="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+        @click.self="emit('close')"
     >
         <div
             class="relative bg-black rounded-lg max-w-5xl w-[90vw] max-h-[80vh] p-4 flex items-center justify-center"
