@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Ads\StoreAdData;
-use App\DTO\Ads\UpdateAdData;
+use App\DTO\Ad\StoreAdData;
+use App\DTO\Ad\UpdateAdData;
 use App\Http\Requests\Ad\StoreAdRequest;
 use App\Http\Requests\Ad\UpdateAdRequest;
 use App\Models\Ad;
