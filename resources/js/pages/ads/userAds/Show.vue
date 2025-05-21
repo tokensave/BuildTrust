@@ -5,7 +5,6 @@ import type { Ad, Company, User } from '@/types';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import AdGalleryModal from '@/components/AdGalleryModal.vue';
 import CompanyCard from '@/components/company/CompanyCard.vue';
-import { Card } from '@/components/ui/card';
 
 const page = usePage<{ ad: Ad & { user: User & { company?: Company } } }>();
 const ad = page.props.ad;
