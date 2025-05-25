@@ -66,6 +66,14 @@ export interface Company {
     verified: boolean;
 }
 
+export type DealStatus = 'pending' | 'accepted' | 'rejected' | 'completed' | 'canceled';
+
+export interface StatusConfig {
+    value: DealStatus;
+    label: string;
+    color: string;
+}
+
 export interface Deal {
     id: number;
     ad_id: number;
@@ -73,9 +81,20 @@ export interface Deal {
     seller_id: number;
     price: number;
     notes?: string;
-    status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'canceled';
+    status: DealStatus;
     created_at: string;
     documents_urls?: string[];
+    buyer: {
+        id: number;
+        name: string;
+        company?: Company;
+    };
+    seller: {
+        id: number;
+        name: string;
+        company?: Company;
+    };
+    ad_title: string;
 }
 
 

@@ -96,6 +96,8 @@ class UserAdsController extends Controller
     }
     public function destroy(int $user, Ad $ad, AdService $service)
     {
+        // TODO необходимо доработать механизм когда если у обьявления есть сделка ,
+        // то удалить невозможно только если статус отклонен
         $service->delete($ad);
 
         return Inertia::location(route('user.ads.index', $user));
