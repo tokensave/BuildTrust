@@ -10,7 +10,9 @@ Route::get('/', static function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/deals', [DealController::class, 'index'])->name('user.deals.index');
     Route::post('/deals/{ad}', [DealController::class, 'store'])->name('deals.store');
+    Route::post('deals/{deal}/status', [DealController::class, 'updateStatus'])->name('user.deals.updateStatus');
 });
 Route::get('/dashboard', [MainController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
