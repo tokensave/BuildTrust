@@ -10,6 +10,7 @@ use App\Models\Deal;
 use App\Services\Deal\DealService;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class DealController extends Controller
 {
@@ -25,7 +26,7 @@ class DealController extends Controller
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function store(StoreDealRequest $request, Ad $ad, DealService $dealService)
     {
