@@ -123,4 +123,5 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'blockchain_api_url' => env('BLOCKCHAIN_API_URL'),
 ];

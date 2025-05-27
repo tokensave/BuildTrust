@@ -7,6 +7,7 @@ namespace App\Services\Deal;
 
 use App\DTO\Deal\StoreDealData;
 use App\Enums\DealEnums\DealStatusEnum;
+use App\Events\DealCreatedOrUpdatedEvent;
 use App\Models\Ad;
 use App\Models\Deal;
 use Illuminate\Support\Collection;
@@ -34,6 +35,7 @@ class DealService
                 }
             }
 
+            event(new DealCreatedOrUpdatedEvent($deal));
             return $deal;
         });
     }
