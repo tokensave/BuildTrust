@@ -29,6 +29,7 @@ class Ad extends Model implements HasMedia
         'status' => AdsStatusEnum::class,
     ];
 
+    protected $appends = ['image_url'];
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -45,5 +46,10 @@ class Ad extends Model implements HasMedia
         $this->addMediaCollection('images')
             ->useDisk('public')
             ->useFallbackUrl('/images/default-ad.png');
+    }
+
+    public function getImageUrlAttribute(): string
+    {
+        return $this->getFirstMediaUrl('images') ?: asset('images/default-ad.png');
     }
 }

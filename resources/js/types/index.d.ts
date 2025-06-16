@@ -24,6 +24,7 @@ export interface SharedData extends PageProps {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    threads?: Thread[];
 }
 
 export interface User {
@@ -97,6 +98,33 @@ export interface Deal {
     ad_title: string;
 }
 
+export interface Thread {
+    id: number;
+    ad: Ad;
+    messages: Message[];
+    participants: Array<{
+        id: number;
+        username: string;
+        email: string;
+    }>;
+    latest_message: {
+        content: string;
+        created_at: string;
+        author_id: number;
+    } | null;
+}
 
+export interface Message {
+    id: number;
+    content: string;
+    created_at: string;
+    author_id: number;
+    thread_id: number;
+    author: {
+        id: number;
+        username: string;
+        email: string;
+    };
+}
 
 export type BreadcrumbItemType = BreadcrumbItem;
