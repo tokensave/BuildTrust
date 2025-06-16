@@ -6,8 +6,9 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 import AdGalleryModal from '@/components/AdGalleryModal.vue';
 import CompanyCard from '@/components/company/CompanyCard.vue';
 import DealCreateModal from '@/components/deal/DealCreateModal.vue';
-import { Button } from '@/components/ui/button'; // 👈
-import { Handshake } from 'lucide-vue-next';
+import { Button } from '@/components/ui/button';
+import { Handshake, MessageSquareMore } from 'lucide-vue-next';
+import MessageCreateModal from '@/components/message/MessageCreateModal.vue';
 
 const page = usePage<{ ad: Ad & { user: User & { company?: Company } } }>();
 const ad = page.props.ad;
@@ -17,6 +18,10 @@ const company = ad.user?.company;
 const isDealModalOpen = ref(false);
 const openDealModal = () => isDealModalOpen.value = true;
 const closeDealModal = () => isDealModalOpen.value = false;
+
+const isMessageModalOpen = ref(false);
+const openMessageModal = () => (isMessageModalOpen.value = true);
+const closeMessageModal = () => (isMessageModalOpen.value = false);
 
 // Модалка галереи
 const modalIndex = ref<number | null>(null);
@@ -76,11 +81,25 @@ onBeforeUnmount(() => {
                     <div class="text-xl font-semibold mt-2">{{ ad.price }} ₽</div>
                 </div>
 
-                <Button
-                    @click="openDealModal"
-                >
-                    <Handshake  /> Предложить сделку
-                </Button>
+                <div class="flex gap-3">
+                    <Button
+                        variant="default"
+                        class="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                        @click="openDealModal"
+                    >
+                        <Handshake class="w-5 h-5" />
+                        Предложить сделку
+                    </Button>
+
+                    <Button
+                        variant="default"
+                        class="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                        @click="openMessageModal"
+                    >
+                        <MessageSquareMore class="w-5 h-5" />
+                        Написать сообщение
+                    </Button>
+                </div>
             </div>
 
             <div class="flex flex-wrap gap-4">
@@ -116,6 +135,13 @@ onBeforeUnmount(() => {
             :price="ad.price"
             :seller-id="ad.user.id"
             :onClose="closeDealModal"
+        />
+
+        <MessageCreateModal
+            :open="isMessageModalOpen"
+            :ad-id="ad.id"
+            :recipient-id="ad.user.id"
+            :onClose="closeMessageModal"
         />
     </AppLayout>
 </template>

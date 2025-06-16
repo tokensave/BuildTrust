@@ -34,7 +34,7 @@ watch(
     (newSuccess) => {
         if (newSuccess) {
             toast.success(newSuccess, {
-                duration: 3000, // Исчезает через 3 секунды
+                duration: 3000,
             });
         }
     }

@@ -24,7 +24,7 @@ class UserAdsController extends Controller
                 'id' => $ad->id,
                 'title' => $ad->title,
                 'description' => $ad->description,
-                'image_url' => $ad->getFirstMediaUrl('images') ?: '/images/default-ad.png',
+                'image_url' => $ad->image_url,
                 'user_id' => $ad->user_id,
                 'status' => $ad->status->value,
             ];
