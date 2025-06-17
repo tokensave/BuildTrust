@@ -56,9 +56,7 @@ class ChatController extends Controller
 
         $thread = $threadService->getOrCreateThread($threadData);
 
-        $message = $messageService->storeMessage($thread, $messageData);
-
-        event(new MessageSent($message));
+        $messageService->storeMessage($thread, $messageData);
 
         return to_route('chats.show', ['thread' => $thread])->with('success', 'Сообщение отправлено!');
     }

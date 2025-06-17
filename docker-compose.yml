@@ -17,12 +17,15 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            BLOCKCHAIN_API_URL: 'http://blockchain-transport:8080'
         volumes:
             - '.:/var/www/html'
         networks:
             - sail
         depends_on:
             - mysql
+            - redis
+            - blockchain-transport
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -47,9 +50,51 @@ services:
                 - '-p${DB_PASSWORD}'
             retries: 3
             timeout: 5s
+    blockchain-transport:
+        build:
+            context: /Users/tokensave/GolandProjects/token.save/blockchain-transport
+            dockerfile: Dockerfile
+        ports:
+            - '8081:8080'
+        environment:
+            POSTGRES_HOST: postgres
+            POSTGRES_PORT: 5432
+            POSTGRES_DB: blockchain_transport
+            POSTGRES_USER: tokensave
+            POSTGRES_PASSWORD: password
+        networks:
+            - sail
+        depends_on:
+            - postgres
+    redis:
+        image: 'redis:7'
+        ports:
+            - '6379:6379'
+        networks:
+            - sail
+    postgres:
+        image: 'postgres:16'
+        ports:
+            - '5432:5432'
+        environment:
+            POSTGRES_DB: blockchain_transport
+            POSTGRES_USER: tokensave
+            POSTGRES_PASSWORD: password
+        volumes:
+            - 'sail-postgres:/var/lib/postgresql/data'
+            - '/Users/tokensave/GolandProjects/token.save/blockchain-transport/init.sql:/docker-entrypoint-initdb.d/init.sql'
+        networks:
+            - sail
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U tokensave -d blockchain_transport"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
 networks:
     sail:
         driver: bridge
 volumes:
     sail-mysql:
+        driver: local
+    sail-postgres:
         driver: local

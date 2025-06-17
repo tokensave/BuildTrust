@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Ad>
  */
-class AdsFactory extends Factory
+class AdFactory extends Factory
 {
     protected $model = Ad::class;
     public function definition(): array

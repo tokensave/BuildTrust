@@ -4,10 +4,11 @@ import { Head, usePage } from '@inertiajs/vue3';
 import { Table, TableRow, TableCell, TableHeader, TableHead, TableBody } from '@/components/ui/table';
 import { ref } from 'vue';
 import AdGalleryModal from '@/components/AdGalleryModal.vue';
-import type { Ad } from '@/types';
+import type { Ad, SharedData, User } from '@/types';
 
-const page = usePage<{ ads: Ad[] }>();
+const page = usePage<SharedData & { ads: Ad[] }>();
 const ads = page.props.ads;
+const user = page.props.auth.user as User;
 
 const modalIndex = ref<number | null>(null);
 const modalImages = ref<string[]>([]);
@@ -62,7 +63,7 @@ const prevImage = () => {
                         <TableCell>
                             <div
                                 class="font-semibold cursor-pointer hover:underline"
-                                @click="$inertia.visit(route('user.ads.show', [ad.user_id, ad.id]))"
+                                @click="$inertia.visit(route('user.ads.show', [user.id, ad.id]))"
                             >
                                 {{ ad.title }}
                             </div>
