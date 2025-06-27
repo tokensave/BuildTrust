@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\DTO\Message\StoreMessageData;
 use App\DTO\Thread\StoreThreadData;
-use App\Events\MessageSent;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Models\Ad;
 use App\Models\Message;

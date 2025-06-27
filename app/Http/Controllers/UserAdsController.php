@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Ad\GetAdData;
 use App\DTO\Ad\StoreAdData;
 use App\DTO\Ad\UpdateAdData;
 use App\Http\Requests\Ad\StoreAdRequest;
@@ -19,16 +20,10 @@ class UserAdsController extends Controller
 {
     public function index(User $user): Response
     {
-        $ads = $user->ads()->with('media')->get()->map(function ($ad) {
-            return [
-                'id' => $ad->id,
-                'title' => $ad->title,
-                'description' => $ad->description,
-                'image_url' => $ad->image_url,
-                'user_id' => $ad->user_id,
-                'status' => $ad->status->value,
-            ];
-        });
+        $ads = $user->ads()
+            ->with('media')
+            ->get()
+            ->map(fn ($ad) => GetAdData::fromModel($ad));
 
         return Inertia::render('ads/userAds/Index', [
             'ads' => $ads,
