@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\DTO\Message\StoreMessageData;
 use App\DTO\Thread\StoreThreadData;
-use App\Events\MessageSent;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Models\Ad;
 use App\Models\Message;
@@ -56,9 +55,7 @@ class ChatController extends Controller
 
         $thread = $threadService->getOrCreateThread($threadData);
 
-        $message = $messageService->storeMessage($thread, $messageData);
-
-        event(new MessageSent($message));
+        $messageService->storeMessage($thread, $messageData);
 
         return to_route('chats.show', ['thread' => $thread])->with('success', 'Сообщение отправлено!');
     }
