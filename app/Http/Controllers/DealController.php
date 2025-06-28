@@ -8,17 +8,21 @@ use App\Http\Requests\Deal\UpdateDealStatusRequest;
 use App\Models\Ad;
 use App\Models\Deal;
 use App\Services\Deal\DealService;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
 
 class DealController extends Controller
 {
+    /**
+     * @param DealService $dealService
+     * @return Response
+     */
     public function index(DealService $dealService): Response
     {
         $deals = $dealService->getDeals();
         $statuses = $dealService->getStatuses();
-
         return Inertia::render('userDeals/Index', [
             'deals' => $deals,
             'statuses' => $statuses,
@@ -30,20 +34,22 @@ class DealController extends Controller
      */
     public function store(StoreDealRequest $request, Ad $ad, DealService $dealService)
     {
-        $data = StoreDealData::fromRequest($request);
-
-        $dealService->createDeal($data, $ad);
-
+        $dealService->createDeal(StoreDealData::fromRequest($request), $ad);
         return Inertia::location(route('user.ads.show', [
             'user' => $ad->user_id,
             'ad' => $ad->id,
         ]));
     }
 
+    /**
+     * @param UpdateDealStatusRequest $request
+     * @param Deal $deal
+     * @param DealService $dealService
+     * @return RedirectResponse
+     */
     public function updateStatus(UpdateDealStatusRequest $request, Deal $deal, DealService $dealService)
     {
         $dealService->updateStatus($deal, $request->status);
-
         return to_route('user.deals.index')->with(['success' => 'Статус успешно обновлен']);
     }
 }

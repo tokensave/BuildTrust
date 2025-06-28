@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Ad\GetAdData;
 use App\DTO\Ad\StoreAdData;
 use App\DTO\Ad\UpdateAdData;
 use App\Http\Requests\Ad\StoreAdRequest;
@@ -18,22 +17,26 @@ use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 class UserAdsController extends Controller
 {
-    public function index(User $user): Response
+    /**
+     * @param User $user
+     * @param AdService $service
+     * @return Response
+     */
+    public function index(User $user, AdService $service): Response
     {
-        $ads = $user->ads()
-            ->with('media')
-            ->get()
-            ->map(fn ($ad) => GetAdData::fromModel($ad));
-
-        return Inertia::render('ads/userAds/Index', [
-            'ads' => $ads,
-        ]);
+        $ads = $service->getUserAds($user);
+        return Inertia::render('ads/userAds/Index', ['ads' => $ads,]);
     }
 
-    public function show(int $user, int $adId): Response
+    /**
+     * @param int $user
+     * @param int $adId
+     * @param AdService $service
+     * @return Response
+     */
+    public function show(int $user, int $adId, AdService $service): Response
     {
-        $ad = Ad::with('media', 'user.company')->findOrFail($adId);
-
+        $ad = $service->findByIdWithCompany($adId);
         return Inertia::render('ads/userAds/Show', [
             'auth' => [
                 'user' => auth()->user(),
@@ -42,6 +45,10 @@ class UserAdsController extends Controller
         ]);
     }
 
+    /**
+     * @param int $user
+     * @return Response
+     */
     public function create(int $user): Response
     {
         return Inertia::render('ads/userAds/Create', [
@@ -57,17 +64,20 @@ class UserAdsController extends Controller
      */
     public function store(StoreAdRequest $request, AdService $service): RedirectResponse
     {
-        $data = StoreAdData::fromRequest($request);
-        $ad = $service->create($request->user(), $data);
-
+        $ad = $service->create($request->user(), StoreAdData::fromRequest($request));
         return to_route('user.ads.store', [$request->user()->id, $ad->id])
             ->with('success', 'Объявление успешно создано');
     }
 
-    public function edit(int $user, int $adId): Response
+    /**
+     * @param int $user
+     * @param int $adId
+     * @param AdService $service
+     * @return Response
+     */
+    public function edit(int $user, int $adId, AdService $service): Response
     {
-        $ad = Ad::with('media')->findOrFail($adId);
-
+        $ad = $service->findById($adId);
         return Inertia::render('ads/userAds/Edit', [
             'auth' => [
                 'user' => auth()->user(),
@@ -82,13 +92,17 @@ class UserAdsController extends Controller
      */
     public function update(UpdateAdRequest $request, int $user, Ad $ad, AdService $service): RedirectResponse
     {
-        $data = UpdateAdData::fromRequest($request);
-
-        $service->update($ad, $data);
-
+        $service->update($ad, UpdateAdData::fromRequest($request));
         return to_route('user.ads.index', $user)
             ->with('success', 'Объявление успешно обновлено');
     }
+
+    /**
+     * @param int $user
+     * @param Ad $ad
+     * @param AdService $service
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function destroy(int $user, Ad $ad, AdService $service)
     {
         // TODO необходимо доработать механизм когда если у обьявления есть сделка ,

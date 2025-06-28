@@ -17,64 +17,36 @@ use Inertia\Response;
 
 class ChatController extends Controller
 {
-    public function index(User $user): Response
+    public function index(User $user, ThreadService $service): Response
     {
-        $threads = Thread::forUser(auth()->id())
-            ->with([
-                'participants:id,username,email',
-                'latestMessage.author:id,username',
-                'ad:id,title,user_id',
-                'ad.media',
-            ])
-            ->orderByDesc('updated_at')
-            ->get();
-
-        return Inertia::render('chat/Index', [
-            'threads' => $threads,
-        ]);
+        $threads = $service->getThreadsForUser();
+        return Inertia::render('chat/Index', ['threads' => $threads]);
     }
 
-    public function show(Thread $thread, MessageService $messageService): Response
+    public function show(Thread $thread, MessageService $messageService, ThreadService $threadService): Response
     {
         $messageService->markAsRead($thread, auth()->id());
-
-        $thread->load([
-            'participants:id,username,email',
-            'messages' => fn ($query) => $query->with('author')->latest()->take(50),
-            'ad:id,title,user_id',
-            'ad.media',
-        ]);
-
+        $thread = $threadService->loadThreadWithRelations($thread);
         return Inertia::render('chat/Show', ['thread' => $thread]);
     }
 
     public function storeMessage(StoreMessageRequest $request, Ad $ad, User $recipient, ThreadService $threadService, MessageService $messageService): RedirectResponse
     {
-        $messageData = StoreMessageData::fromRequest($request);
-        $threadData = StoreThreadData::fromRequest($request);
-
-        $thread = $threadService->getOrCreateThread($threadData);
-
-        $messageService->storeMessage($thread, $messageData);
-
+        $thread = $threadService->getOrCreateThread(StoreThreadData::fromRequest($request));
+        $messageService->storeMessage($thread, StoreMessageData::fromRequest($request));
         return to_route('chats.show', ['thread' => $thread])->with('success', 'Сообщение отправлено!');
     }
 
-    public function deleteThread(Thread $thread): RedirectResponse
+    public function deleteThread(Thread $thread, ThreadService $service): RedirectResponse
     {
-        $thread->delete();
+        $service->deleteThread($thread);
         return to_route('chats.index')->with('success', 'Чат удален!');
     }
 
-    public function deleteMessage(Message $message): RedirectResponse
+    public function deleteMessage(Message $message, MessageService $service): RedirectResponse
     {
-        if ($message->author_id !== auth()->id()) {
-            abort(403, 'Вы не можете удалить это сообщение');
-        }
         $thread = $message->thread;
-
-        $message->delete();
-
+        $service->deleteMessage($message, auth()->id());
         return to_route('chats.show', ['thread' => $thread]);
     }
 

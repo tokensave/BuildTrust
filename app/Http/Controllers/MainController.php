@@ -2,23 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Ad\GetAdData;
-use App\Enums\AdEnums\AdsStatusEnum;
-use App\Models\Ad;
+use App\Services\Ad\AdService;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class MainController extends Controller
 {
-    public function index(): Response
+    public function index(AdService $service): Response
     {
-        $ads = Ad::with('media')
-            ->where('status', AdsStatusEnum::PUBLISHED->value)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return Inertia::render('Dashboard', [
-            'ads' => GetAdData::collect($ads)
-        ]);
+        $ads = $service->getPublishedAds();
+        return Inertia::render('Dashboard', ['ads' => $ads]);
     }
 }
