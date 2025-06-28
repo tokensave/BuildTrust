@@ -32,10 +32,7 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request, UserProfileService $service): RedirectResponse
     {
-        $data = UserProfileData::fromRequest($request);
-
-        $service->update($request->user(), $data);
-
+        $service->update($request->user(), UserProfileData::fromRequest($request));
         return to_route('profile.edit')->with('status', 'profile-updated');
     }
 

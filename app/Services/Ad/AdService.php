@@ -4,16 +4,62 @@ declare(strict_types=1);
 
 namespace App\Services\Ad;
 
+use App\DTO\Ad\GetAdData;
 use App\DTO\Ad\StoreAdData;
 use App\DTO\Ad\UpdateAdData;
+use App\Enums\AdEnums\AdsStatusEnum;
 use App\Models\Ad;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 class AdService
 {
+    /**
+     * @return Collection
+     */
+    public function getPublishedAds(): Collection
+    {
+        $ads = Ad::with('media')
+            ->where('status', AdsStatusEnum::PUBLISHED->value)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return GetAdData::collect($ads);
+    }
+    /**
+     * Получить список объявлений пользователя с медиа и привести к DTO
+     * @param User $user
+     * @return Collection|GetAdData[]
+     */
+    public function getUserAds(User $user): array|Collection
+    {
+        return $user->ads()
+            ->with('media')
+            ->get()
+            ->map(fn ($ad) => GetAdData::fromModel($ad));
+    }
+    /**
+     * @param int $id
+     * @return Ad
+     */
+    public function findByIdWithCompany(int $id): Ad
+    {
+        return $this->findById($id, ['media', 'user.company']);
+    }
+
+    /**
+     * @param int $id
+     * @param array $relations
+     * @return Ad
+     */
+    public function findById(int $id, array $relations = ['media']): Ad
+    {
+        return Ad::with($relations)->findOrFail($id);
+    }
+
     /**
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
