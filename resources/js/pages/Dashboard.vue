@@ -69,7 +69,7 @@ const prevImage = () => {
                             </div>
                             <div
                                 class="text-sm text-muted-foreground cursor-pointer hover:underline"
-                                @click="$inertia.visit(route('user.ads.show', [ad.user_id, ad.id]))"
+                                @click="$inertia.visit(route('user.ads.show', [user.id, ad.id]))"
                             >
                                 {{ ad.description }}
                             </div>

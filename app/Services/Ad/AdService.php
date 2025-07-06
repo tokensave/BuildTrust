@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Services\Ad;
 
 use App\DTO\Ad\GetAdData;
+use App\DTO\Ad\ShowAdData;
 use App\DTO\Ad\StoreAdData;
 use App\DTO\Ad\UpdateAdData;
 use App\Enums\AdEnums\AdsStatusEnum;
 use App\Models\Ad;
 use App\Models\User;
+use App\Services\Media\MediaService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
@@ -17,6 +19,7 @@ use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 class AdService
 {
+    public function __construct(private MediaService $mediaService) {}
     /**
      * @return Collection
      */
@@ -43,9 +46,9 @@ class AdService
     }
     /**
      * @param int $id
-     * @return Ad
+     * @return ShowAdData
      */
-    public function findByIdWithCompany(int $id): Ad
+    public function findByIdWithCompany(int $id): ShowAdData
     {
         return $this->findById($id, ['media', 'user.company']);
     }
@@ -53,11 +56,11 @@ class AdService
     /**
      * @param int $id
      * @param array $relations
-     * @return Ad
+     * @return ShowAdData
      */
-    public function findById(int $id, array $relations = ['media']): Ad
+    public function findById(int $id, array $relations = ['media']): ShowAdData
     {
-        return Ad::with($relations)->findOrFail($id);
+        return ShowAdData::fromModel(Ad::with($relations)->findOrFail($id));
     }
 
     /**
@@ -123,14 +126,20 @@ class AdService
      */
     protected function saveImages(Ad $ad, ?array $images): void
     {
-        if (! $images) {
-            return;
-        }
-
-        foreach ($images as $file) {
-            $ad->addMedia($file)
-                ->usingFileName(uniqid('', true) . '.' . $file->extension())
-                ->toMediaCollection('images');
-        }
+        $this->mediaService->addMediaFiles(
+            $ad,
+            $images, // массив файлов
+            'images',
+            config('media.mime_types.ad_images')
+        );
+//        if (! $images) {
+//            return;
+//        }
+//
+//        foreach ($images as $file) {
+//            $ad->addMedia($file)
+//                ->usingFileName(uniqid('', true) . '.' . $file->extension())
+//                ->toMediaCollection('images');
+//        }
     }
 }

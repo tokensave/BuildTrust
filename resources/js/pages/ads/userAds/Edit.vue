@@ -37,7 +37,7 @@ const form = useForm({
 });
 
 const handleSubmit = () => {
-    form.post(route('user.ads.update', [ad.user_id, ad.id]), {
+    form.post(route('user.ads.update', [user.id, ad.id]), {
         forceFormData: true,
     });
 };

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\Ad\GetAdData;
+use App\DTO\Ad\ShowAdData;
 use App\DTO\Ad\StoreAdData;
 use App\DTO\Ad\UpdateAdData;
 use App\Http\Requests\Ad\StoreAdRequest;
@@ -38,9 +40,7 @@ class UserAdsController extends Controller
     {
         $ad = $service->findByIdWithCompany($adId);
         return Inertia::render('ads/userAds/Show', [
-            'auth' => [
-                'user' => auth()->user(),
-            ],
+            'auth' => ['user' => auth()->user()],
             'ad' => $ad,
         ]);
     }

@@ -45,7 +45,8 @@ class Ad extends Model implements HasMedia
     {
         $this->addMediaCollection('images')
             ->useDisk('public')
-            ->useFallbackUrl('/images/default-ad.png');
+            ->useFallbackUrl(config('media.fallbacks.ad_image'))
+            ->acceptsMimeTypes(config('media.mime_types.ad_images'));
     }
 
     public function getImageUrlAttribute(): string
