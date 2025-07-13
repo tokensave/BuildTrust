@@ -5,6 +5,8 @@ declare(ticks=1000);
 
 namespace App\Services\Chat;
 
+use App\DTO\Thread\GetThreadData;
+use App\DTO\Thread\ShowThreadData;
 use App\DTO\Thread\StoreThreadData;
 use App\Models\Thread;
 use Illuminate\Support\Collection;
@@ -16,29 +18,31 @@ class ThreadService
      */
     public function getThreadsForUser(): Collection
     {
-        return Thread::forUser(auth()->id())
+        $threads = Thread::forUser(auth()->id())
             ->with([
                 'participants:id,username,email',
                 'latestMessage.author:id,username',
-                'ad:id,title,user_id',
+                'ad',
                 'ad.media',
             ])
             ->orderByDesc('updated_at')
             ->get();
+
+        return GetThreadData::collect($threads);
     }
 
     /**
      * @param Thread $thread
-     * @return Thread
+     * @return ShowThreadData
      */
-    public function loadThreadWithRelations(Thread $thread): Thread
+    public function loadThreadWithRelations(Thread $thread): ShowThreadData
     {
-        return $thread->load([
+        return ShowThreadData::fromModel($thread->load([
             'participants:id,username,email',
             'messages' => fn ($query) => $query->with('author')->latest()->take(50),
-            'ad:id,title,user_id',
-            'ad.media',
-        ]);
+            'ad',
+            'messages.author:id,username',
+        ]));
     }
 
     /**

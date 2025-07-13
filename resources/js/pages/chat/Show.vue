@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input'; // Вернем Input для простоты
+import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/AppLayout.vue';
@@ -111,7 +111,7 @@ function deleteMessage(messageId: number) {
 
             <Separator />
 
-            <!-- Chat -->
+             Chat
             <ScrollArea class="h-[500px] border rounded-xl bg-muted/50">
                 <div ref="scrollAreaInner" class="h-full p-4">
                     <div class="flex flex-col space-y-3">
@@ -133,7 +133,7 @@ function deleteMessage(messageId: number) {
                             >
                                 <p class="text-sm whitespace-pre-line">{{ message.content }}</p>
                                 <p class="text-xs mt-1 text-muted-foreground text-right">
-                                    {{ message.author.username }},
+                                    {{ message.author_name }},
                                     {{ format(new Date(message.created_at), 'dd.MM.yyyy HH:mm') }}
                                 </p>
                             </div>

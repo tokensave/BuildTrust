@@ -50,8 +50,8 @@ function deleteThread(threadId: number) {
             <div v-if="threads.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <Card v-for="thread in threads" :key="thread.id" class="overflow-hidden shadow">
                     <CardHeader class="flex gap-4 items-center">
-                        <Avatar class="h-16 w-16">
-                            <AvatarImage :src="thread.ad.image_url" alt="Объявление" />
+                        <Avatar class="h-32 w-32 rounded-2xl">
+                            <AvatarImage :src="thread.ad.image_url ?? '/default.jpg'" alt="Объявление" />
                         </Avatar>
                         <div class="flex-1">
                             <CardTitle class="text-base truncate">

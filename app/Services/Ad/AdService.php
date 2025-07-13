@@ -105,9 +105,7 @@ class AdService
         // Добавляем новые изображения
         if (!empty($data->newImages)) {
             foreach ($data->newImages as $file) {
-                $ad->addMedia($file)
-                    ->usingFileName(uniqid('', true) . '.' . $file->extension())
-                    ->toMediaCollection('images');
+                $this->saveImages($ad, $file);
             }
         }
 
@@ -132,14 +130,5 @@ class AdService
             'images',
             config('media.mime_types.ad_images')
         );
-//        if (! $images) {
-//            return;
-//        }
-//
-//        foreach ($images as $file) {
-//            $ad->addMedia($file)
-//                ->usingFileName(uniqid('', true) . '.' . $file->extension())
-//                ->toMediaCollection('images');
-//        }
     }
 }
