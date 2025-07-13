@@ -12,7 +12,7 @@ class LatestMessageData extends Data
 {
     public function __construct(
         public string $content,
-        #[CastWith(DateTimeInterfaceCast::class)]
+        #[WithCast(DateTimeInterfaceCast::class)]
         public string $created_at,
         public int $author_id,
     ) {}

@@ -14,7 +14,7 @@ class MessageData extends Data
     public function __construct(
         public string $content,
         public int $author_id,
-        #[CastWith(DateTimeInterfaceCast::class)]
+        #[WithCast(DateTimeInterfaceCast::class)]
         public string $created_at,
         public ?string $author_name
     ) {
