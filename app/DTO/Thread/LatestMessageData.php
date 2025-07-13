@@ -14,6 +14,6 @@ class LatestMessageData extends Data
         public string $content,
         #[CastWith(DateTimeInterfaceCast::class)]
         public string $created_at,
-        public int $sender_id,
+        public int $author_id,
     ) {}
 }

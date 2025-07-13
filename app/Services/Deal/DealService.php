@@ -56,7 +56,7 @@ class DealService
             ->map(function ($deal) {
                 return [
                     'id' => $deal->id,
-                    'ad_title' => $deal->ad->title,
+                    'ad_title' => $deal->ad->title ?? null,
                     'price' => $deal->price,
                     'status' => $deal->status,
                     'notes' => $deal->notes,

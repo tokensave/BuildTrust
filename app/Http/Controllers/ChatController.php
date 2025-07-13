@@ -15,19 +15,22 @@ use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
+// TODO Необходимо перебрать весь контроллер + сервис
 class ChatController extends Controller
 {
+    // TODO необходимо во vue разобраться почему картинка сплющивается сильно
     public function index(User $user, ThreadService $service): Response
     {
         $threads = $service->getThreadsForUser();
         return Inertia::render('chat/Index', ['threads' => $threads]);
     }
 
+    // TODO Необходимо перелопатить весь vue файл метода
     public function show(Thread $thread, MessageService $messageService, ThreadService $threadService): Response
     {
         $messageService->markAsRead($thread, auth()->id());
         $thread = $threadService->loadThreadWithRelations($thread);
-        return Inertia::render('chat/Show', ['thread' => $thread]);
+        return Inertia::render('chat/Show', ['thread' => $thread->toArray()]);
     }
 
     public function storeMessage(StoreMessageRequest $request, Ad $ad, User $recipient, ThreadService $threadService, MessageService $messageService): RedirectResponse

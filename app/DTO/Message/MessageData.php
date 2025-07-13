@@ -5,24 +5,28 @@ declare(ticks=1000);
 
 namespace App\DTO\Message;
 
-use Illuminate\Http\Request;
+use App\Models\Message;
+use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Data;
 
 class MessageData extends Data
 {
     public function __construct(
         public string $content,
-        public int $ad_id,
-        public int $sender_id,
-        public int $receiver_id,
+        public int $author_id,
+        #[CastWith(DateTimeInterfaceCast::class)]
+        public string $created_at,
+        public ?string $author_name
     ) {
     }
 
-    public static function fromRequest(Request $request): self
-    {
-        return self::from([
-                ...$request->validated(),
-            ]
-        );
-    }
+   public static function fromModel(Message $message): self
+   {
+       return new self(
+           content: $message->content,
+           author_id: $message->author_id,
+           created_at: $message->created_at->toDateTimeString(),
+           author_name: $message->author->username
+       );
+   }
 }

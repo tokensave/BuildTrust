@@ -5,18 +5,22 @@ declare(ticks=1000);
 
 namespace App\DTO\Thread;
 
+use App\DTO\Ad\ShowAdData;
+use App\DTO\Message\MessageData;
 use App\Models\Thread;
 use Spatie\LaravelData\Attributes\DataCollectionOf;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 
-class ThreadData extends Data
+class ShowThreadData extends Data
 {
     public function __construct(
         public int $id,
         #[DataCollectionOf(ParticipantData::class)]
         public DataCollection $participants,
-        public ?LatestMessageData $latest_message,
+        #[DataCollectionOf(MessageData::class)]
+        public DataCollection $messages,
+        public ?ShowAdData $ad,
     ) {}
 
     public static function fromModel(Thread $thread): self
@@ -24,9 +28,8 @@ class ThreadData extends Data
         return new self(
             id: $thread->id,
             participants: ParticipantData::collect($thread->participants, DataCollection::class),
-            latest_message: $thread->messages->first()
-                ? LatestMessageData::from($thread->messages->first())
-                : null,
+            messages: MessageData::collect($thread->messages, DataCollection::class),
+            ad: $thread->ad ? ShowAdData::fromModel($thread->ad) : null,
         );
     }
 }
