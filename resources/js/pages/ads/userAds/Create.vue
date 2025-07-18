@@ -10,6 +10,7 @@ import { type BreadcrumbItem, type SharedData, type User } from '@/types';
 import { useForm, usePage } from '@inertiajs/vue3';
 import ImagePreviewUploader from '@/components/ImagePreviewUploader.vue';
 import InputError from '@/components/InputError.vue';
+import { toast } from 'vue-sonner';
 
 const page = usePage<SharedData>();
 const user = page.props.auth.user as User;
@@ -35,6 +36,21 @@ const form = useForm({
     images: [] as File[],
 });
 
+const handleSubmit = () => {
+    form.post(route('user.ads.store', user.id), {
+        forceFormData: true,
+        onSuccess: () => {
+            toast.success('Объявление успешно создано', {
+                duration: 3000,
+            });
+        },
+        onError: () => {
+            toast.error('Ошибка при создании объявления', {
+                duration: 5000,
+            });
+        }
+    });
+};
 </script>
 
 <template>
@@ -42,7 +58,7 @@ const form = useForm({
         <div class="p-4">
             <Card>
                 <CardContent class="space-y-4">
-                    <form @submit.prevent="form.post(route('user.ads.store', user.id), { forceFormData: true })" class="space-y-4">
+                    <form @submit.prevent="handleSubmit" class="space-y-4">
                         <div>
                             <Label for="title" class="mb-1 block text-sm font-medium">Заголовок</Label>
                             <Input id="title" v-model="form.title" type="text"/>

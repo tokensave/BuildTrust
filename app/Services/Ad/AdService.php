@@ -77,7 +77,9 @@ class AdService
             'status'      => $data->status,
         ]);
 
-        $this->saveImages($ad, $data->images);
+        if (!empty($data->images)) {
+            $this->saveImages($ad, $data->images);
+        }
 
         return $ad;
     }
