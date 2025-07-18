@@ -79,9 +79,7 @@ class UserAdsController extends Controller
     {
         $ad = $service->findById($adId);
         return Inertia::render('ads/userAds/Edit', [
-            'auth' => [
-                'user' => auth()->user(),
-            ],
+            'auth' => ['user' => auth()->user()],
             'ad' => $ad,
         ]);
     }

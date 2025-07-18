@@ -33,6 +33,7 @@ class ShowAdData extends Data
             status: $ad->status->value,
             image_url: $ad->getFirstMediaUrl('images') ?: asset('images/default-ad.png'),
             media: $ad->getMedia('images')->map(fn ($m) => [
+                'id' => $m->id,
                 'original_url'  => $m->getUrl(),
             ])->toArray(),
             created_at: $ad->created_at->toDateTimeString(),

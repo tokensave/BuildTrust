@@ -97,15 +97,13 @@ class AdService
 
         // Удаляем только указанные изображения
         if (!empty($data->deletedMediaIds)) {
-            $ad->media()
-                ->whereIn('id', $data->deletedMediaIds)
-                ->each(fn ($media) => $media->delete());
+            $this->mediaService->removeMediaByIds($ad, $data->deletedMediaIds);
         }
 
         // Добавляем новые изображения
         if (!empty($data->newImages)) {
             foreach ($data->newImages as $file) {
-                $this->saveImages($ad, $file);
+                $this->saveImages($ad, [$file]);
             }
         }
 

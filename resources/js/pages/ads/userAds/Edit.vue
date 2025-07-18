@@ -10,6 +10,7 @@ import type { Ad, BreadcrumbItem, SharedData, User } from '@/types';
 import { useForm, usePage } from '@inertiajs/vue3';
 import ImagePreviewUploader from '@/components/ImagePreviewUploader.vue';
 import InputError from '@/components/InputError.vue';
+import { toast } from 'vue-sonner';
 
 const page = usePage<SharedData & { ad: Ad }>();
 const user = page.props.auth.user as User;
@@ -39,8 +40,19 @@ const form = useForm({
 const handleSubmit = () => {
     form.post(route('user.ads.update', [user.id, ad.id]), {
         forceFormData: true,
+        onSuccess: () => {
+            toast.success('Объявление успешно обновлено', {
+                duration: 3000,
+            });
+        },
+        onError: () => {
+            toast.error('Ошибка при сохранении.', {
+                duration: 5000,
+            });
+        }
     });
 };
+
 </script>
 
 <template>
