@@ -3,6 +3,7 @@ import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { Trash2 } from 'lucide-vue-next';
 import type { SharedData, User } from '@/types';
+import { toast } from 'vue-sonner';
 
 // Получаем авторизованного пользователя из глобальных пропсов
 const page = usePage<SharedData>();

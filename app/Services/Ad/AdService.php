@@ -9,13 +9,16 @@ use App\DTO\Ad\ShowAdData;
 use App\DTO\Ad\StoreAdData;
 use App\DTO\Ad\UpdateAdData;
 use App\Enums\AdEnums\AdsStatusEnum;
+use App\Enums\DealEnums\DealStatusEnum;
 use App\Models\Ad;
 use App\Models\User;
 use App\Services\Media\MediaService;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
+use Throwable;
 
 class AdService
 {
@@ -66,48 +69,54 @@ class AdService
     /**
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
+     * @throws Throwable
      */
     public function create(User $user, StoreAdData $data): Ad
     {
-        $ad = $user->ads()->create([
-            'title'       => $data->title,
-            'description' => $data->description,
-            'price'       => $data->price,
-            'slug'        => Str::slug($data->title) . '-' . uniqid('', true),
-            'status'      => $data->status,
-        ]);
+        return DB::transaction(function () use ($user, $data) {
+            $ad = $user->ads()->create([
+                'title'       => $data->title,
+                'description' => $data->description,
+                'price'       => $data->price,
+                'slug'        => Str::slug($data->title) . '-' . uniqid('', true),
+                'status'      => $data->status,
+            ]);
 
-        if (!empty($data->images)) {
-            $this->saveImages($ad, $data->images);
-        }
+            if (!empty($data->images)) {
+                $this->saveImages($ad, $data->images);
+            }
 
-        return $ad;
+            return $ad;
+        });
     }
 
     /**
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
+     * @throws Throwable
      */
     public function update(Ad $ad, UpdateAdData $data): Ad
     {
-        $ad->update([
-            'title'       => $data->title,
-            'description' => $data->description,
-            'price'       => $data->price,
-            'status'      => $data->status,
-        ]);
+        DB::transaction(function () use ($ad, $data) {
+            $ad->update([
+                'title'       => $data->title,
+                'description' => $data->description,
+                'price'       => $data->price,
+                'status'      => $data->status,
+            ]);
 
-        // Удаляем только указанные изображения
-        if (!empty($data->deletedMediaIds)) {
-            $this->mediaService->removeMediaByIds($ad, $data->deletedMediaIds);
-        }
-
-        // Добавляем новые изображения
-        if (!empty($data->newImages)) {
-            foreach ($data->newImages as $file) {
-                $this->saveImages($ad, [$file]);
+            // Удаляем только указанные изображения
+            if (!empty($data->deletedMediaIds)) {
+                $this->mediaService->removeMediaByIds($ad, $data->deletedMediaIds);
             }
-        }
+
+            // Добавляем новые изображения
+            if (!empty($data->newImages)) {
+                foreach ($data->newImages as $file) {
+                    $this->saveImages($ad, [$file]);
+                }
+            }
+        });
 
         return $ad;
     }
@@ -130,5 +139,11 @@ class AdService
             'images',
             config('media.mime_types.ad_images')
         );
+    }
+
+    public function checkDeal(Ad $ad): bool
+    {
+        $status = $ad->deals()->pluck('status');
+        return $status !== (DealStatusEnum::CANCELED)->value;
     }
 }

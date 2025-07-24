@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from 'vue-sonner'; // Правильный импорт toast
+import { toast } from 'vue-sonner';
 import { type SharedData, type BreadcrumbItem, type Deal, type DealStatus, type StatusConfig } from '@/types';
 
 const page = usePage<SharedData>();
@@ -57,7 +57,7 @@ function updateStatus() {
         router.post(route('user.deals.updateStatus', selectedDeal.value.id), {
             status: selectedStatus.value
         }, {
-            onSuccess: (page) => {
+            onSuccess: () => {
                 if (selectedDeal.value) {
                     selectedDeal.value.status = selectedStatus.value;
                     const dealIndex = deals.value.findIndex(d => d.id === selectedDeal.value!.id);

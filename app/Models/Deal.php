@@ -44,6 +44,7 @@ class Deal extends Model implements HasMedia
         return $this->belongsTo(User::class, 'seller_id');
     }
 
+    // TODO Переработать эти методы если они нужны или нет
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('documents')

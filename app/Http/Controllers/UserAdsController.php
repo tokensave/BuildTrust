@@ -16,6 +16,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
+use Throwable;
 
 class UserAdsController extends Controller
 {
@@ -60,7 +61,7 @@ class UserAdsController extends Controller
 
     /**
      * @throws FileDoesNotExist
-     * @throws FileIsTooBig
+     * @throws FileIsTooBig|Throwable
      */
     public function store(StoreAdRequest $request, AdService $service): RedirectResponse
     {
@@ -86,7 +87,7 @@ class UserAdsController extends Controller
 
     /**
      * @throws FileDoesNotExist
-     * @throws FileIsTooBig
+     * @throws FileIsTooBig|Throwable
      */
     public function update(UpdateAdRequest $request, int $user, Ad $ad, AdService $service): RedirectResponse
     {
@@ -103,10 +104,12 @@ class UserAdsController extends Controller
      */
     public function destroy(int $user, Ad $ad, AdService $service)
     {
-        // TODO необходимо доработать механизм когда если у обьявления есть сделка ,
-        // то удалить невозможно только если статус отклонен
-        $service->delete($ad);
-
-        return Inertia::location(route('user.ads.index', $user));
+        if (!$service->checkDeal($ad))
+        {
+            $service->delete($ad);
+        } else {
+            return redirect()->back()->with('fail', 'Невозможно удалить объявление при наличии активной сделки.');
+        }
+        return to_route('user.ads.index', $user);
     }
 }
