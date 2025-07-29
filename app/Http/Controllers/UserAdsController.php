@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\DTO\Ad\GetAdData;
-use App\DTO\Ad\ShowAdData;
+
 use App\DTO\Ad\StoreAdData;
 use App\DTO\Ad\UpdateAdData;
 use App\Http\Requests\Ad\StoreAdRequest;
@@ -104,12 +103,10 @@ class UserAdsController extends Controller
      */
     public function destroy(int $user, Ad $ad, AdService $service)
     {
-        if (!$service->checkDeal($ad))
-        {
-            $service->delete($ad);
-        } else {
-            return redirect()->back()->with('fail', 'Невозможно удалить объявление при наличии активной сделки.');
-        }
-        return to_route('user.ads.index', $user);
+        abort_if($service->checkDeal($ad), 403, 'Невозможно удалить объявление при наличии незакрытых сделок.');
+
+        $service->delete($ad);
+
+        return to_route('user.ads.index', $user)->with('success', 'Объявление успешно удалено.');
     }
 }

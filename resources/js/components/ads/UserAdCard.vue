@@ -47,6 +47,9 @@ function deleteAd() {
             onSuccess: () => {
                 router.reload({ only: ['ads'] });
             },
+            onError: () => {
+                toast.error('Невозможно удалить объявление при наличии незакрытых сделок.')
+            }
         });
     }
 }

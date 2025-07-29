@@ -143,7 +143,9 @@ class AdService
 
     public function checkDeal(Ad $ad): bool
     {
-        $status = $ad->deals()->pluck('status');
-        return $status !== (DealStatusEnum::CANCELED)->value;
+        // Возвращает true, если есть хотя бы одна сделка не в статусе CANCELED
+        return $ad->deals()
+            ->where('status', '!=', DealStatusEnum::CANCELED->value)
+            ->exists();
     }
 }
