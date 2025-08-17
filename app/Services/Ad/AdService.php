@@ -24,16 +24,35 @@ class AdService
 {
     public function __construct(private MediaService $mediaService) {}
     /**
+     * Получить опубликованные объявления с фильтрами
+     * @param array $filters Фильтры для поиска
      * @return Collection
      */
-    public function getPublishedAds(): Collection
+    public function getPublishedAds(array $filters = []): Collection
     {
-        $ads = Ad::with('media')
-            ->where('status', AdsStatusEnum::PUBLISHED->value)
+        $ads = Ad::filtered($filters)
+            ->with('media')
+            ->orderBy('is_urgent', 'desc') // срочные вверху
             ->orderBy('created_at', 'desc')
             ->get();
 
         return GetAdData::collect($ads);
+    }
+
+    /**
+     * Получить опубликованные объявления с пагинацией
+     * @param array $filters Фильтры для поиска
+     * @param int $perPage Количество на страницу
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getPublishedAdsPaginated(array $filters = [], int $perPage = 12)
+    {
+        return Ad::filtered($filters)
+            ->with('media')
+            ->orderBy('is_urgent', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage)
+            ->withQueryString();
     }
     /**
      * Получить список объявлений пользователя с медиа и привести к DTO
@@ -75,11 +94,17 @@ class AdService
     {
         return DB::transaction(function () use ($user, $data) {
             $ad = $user->ads()->create([
-                'title'       => $data->title,
-                'description' => $data->description,
-                'price'       => $data->price,
-                'slug'        => Str::slug($data->title) . '-' . uniqid('', true),
-                'status'      => $data->status,
+                'title'        => $data->title,
+                'type'         => $data->type,
+                'category'     => $data->category,
+                'subcategory'  => $data->subcategory,
+                'location'     => $data->location,
+                'description'  => $data->description,
+                'price'        => $data->price,
+                'is_urgent'    => $data->is_urgent,
+                'features'     => $data->features,
+                'slug'         => Str::slug($data->title) . '-' . uniqid('', true),
+                'status'       => $data->status,
             ]);
 
             if (!empty($data->images)) {
@@ -99,10 +124,16 @@ class AdService
     {
         DB::transaction(function () use ($ad, $data) {
             $ad->update([
-                'title'       => $data->title,
-                'description' => $data->description,
-                'price'       => $data->price,
-                'status'      => $data->status,
+                'title'        => $data->title,
+                'type'         => $data->type,
+                'category'     => $data->category,
+                'subcategory'  => $data->subcategory,
+                'location'     => $data->location,
+                'description'  => $data->description,
+                'price'        => $data->price,
+                'is_urgent'    => $data->is_urgent,
+                'features'     => $data->features,
+                'status'       => $data->status,
             ]);
 
             // Удаляем только указанные изображения
