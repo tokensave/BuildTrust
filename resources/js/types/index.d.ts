@@ -1,6 +1,9 @@
 import type { PageProps } from '@inertiajs/core';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
+import type { AD_TYPES, ALL_CATEGORIES, SUBCATEGORIES_BY_CATEGORY, AD_STATUS_OPTIONS } from './ad-enums';
+
+
 
 export interface Auth {
     user: User;
@@ -38,14 +41,29 @@ export interface User {
     company?: Company;
 }
 
+// Добавьте типы
+export type AdTypeOption = typeof AD_TYPES[number];
+export type AdCategoryOption = typeof ALL_CATEGORIES[number];
+export type AdStatusOption = typeof AD_STATUS_OPTIONS[number];
+export type AdSubCategoryOption = typeof SUBCATEGORIES_BY_CATEGORY[number];
 export interface Ad {
     id: number;
     title: string;
+    type: string;
+    category?: string;
+    subcategory?: string;
+    location?: string;
     description: string;
     price: number;
+    is_urgent: boolean;
+    features?: string[];
     slug: string;
     status: string;
     user_id: number;
+    formatted_category?: string; // Аксессор для красивого отображения категорий
+    is_service: boolean; // Аксессор для проверки типа
+    created_at: string;
+    updated_at: string;
     media?: {
         original_url: string;
     }[];
@@ -53,6 +71,43 @@ export interface Ad {
         id: number;
         name: string;
         company?: Company;
+    };
+}
+
+// Типы для фильтров
+export interface AdFilter {
+    type?: string;
+    category?: string;
+    subcategory?: string;
+    location?: string;
+    min_price?: number;
+    max_price?: number;
+    urgent?: boolean;
+    search?: string;
+}
+
+export interface AdType {
+    value: string;
+    label: string;
+    description: string;
+}
+
+export interface AdCategory {
+    value: string;
+    label: string;
+}
+
+export interface AdSubcategory {
+    value: string;
+    label: string;
+}
+
+export interface CategoriesStructure {
+    [categoryKey: string]: {
+        label: string;
+        subcategories: {
+            [subcategoryKey: string]: AdSubcategory;
+        };
     };
 }
 
@@ -67,13 +122,6 @@ export interface Company {
     verified: boolean;
 }
 
-export type DealStatus = 'pending' | 'accepted' | 'rejected' | 'completed' | 'canceled';
-
-export interface StatusConfig {
-    value: DealStatus;
-    label: string;
-    color: string;
-}
 
 export interface Deal {
     id: number;
@@ -97,6 +145,14 @@ export interface Deal {
     };
     ad_title: string;
 }
+
+export interface StatusConfig {
+    value: DealStatus;
+    label: string;
+    color: string;
+}
+
+export type DealStatus = 'pending' | 'accepted' | 'rejected' | 'completed' | 'canceled';
 
 export interface Thread {
     id: number;
