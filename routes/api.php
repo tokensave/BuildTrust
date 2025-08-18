@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\Api\AiController;
 use App\Http\Controllers\Api\FilterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,3 +20,12 @@ Route::prefix('filters')->group(function () {
     Route::get('structure', [FilterController::class, 'getAllStructure'])->name('api.filters.structure');
     Route::get('locations', [FilterController::class, 'getPopularLocations'])->name('api.filters.locations');
 });
+
+// AI маршруты
+Route::post('ai/search-company', [AiController::class, 'searchCompany'])->name('api.ai.search-company');
+Route::post('ai/check-counterparty', [AiController::class, 'checkCounterparty'])->name('api.ai.check-counterparty');
+
+//Route::middleware('auth:sanctum')->group(function () {
+//    Route::post('ai/search-company', [AiController::class, 'searchCompany'])->name('api.ai.search-company');
+//    Route::post('ai/check-counterparty', [AiController::class, 'checkCounterparty'])->name('api.ai.check-counterparty');
+//});
