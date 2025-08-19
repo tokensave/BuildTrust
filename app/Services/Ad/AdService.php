@@ -8,11 +8,11 @@ use App\DTO\Ad\GetAdData;
 use App\DTO\Ad\ShowAdData;
 use App\DTO\Ad\StoreAdData;
 use App\DTO\Ad\UpdateAdData;
-use App\Enums\AdEnums\AdsStatusEnum;
 use App\Enums\DealEnums\DealStatusEnum;
 use App\Models\Ad;
 use App\Models\User;
 use App\Services\Media\MediaService;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -23,37 +23,25 @@ use Throwable;
 class AdService
 {
     public function __construct(private MediaService $mediaService) {}
-    /**
-     * Получить опубликованные объявления с фильтрами
-     * @param array $filters Фильтры для поиска
-     * @return Collection
-     */
-    public function getPublishedAds(array $filters = []): Collection
-    {
-        $ads = Ad::filtered($filters)
-            ->with('media')
-            ->orderBy('is_urgent', 'desc') // срочные вверху
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return GetAdData::collect($ads);
-    }
 
     /**
-     * Получить опубликованные объявления с пагинацией
+     * Получить опубликованные объявления с фильтрами и пагинацией
      * @param array $filters Фильтры для поиска
      * @param int $perPage Количество на страницу
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      */
-    public function getPublishedAdsPaginated(array $filters = [], int $perPage = 12)
+    public function getPublishedAds(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
-        return Ad::filtered($filters)
+        $ads = Ad::filtered($filters)
             ->with('media')
             ->orderBy('is_urgent', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->withQueryString();
+
+        return $ads->through(fn ($ad) => GetAdData::fromModel($ad));
     }
+
     /**
      * Получить список объявлений пользователя с медиа и привести к DTO
      * @param User $user

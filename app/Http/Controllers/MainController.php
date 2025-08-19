@@ -22,16 +22,21 @@ class MainController extends Controller
 
         // Убираем пустые значения
         $filters = array_filter($filters);
-        \Log::info('=== DEBUG FILTERS ===');
-        \Log::info('Request URL:', ['url' => $request->fullUrl()]);
-        \Log::info('Request filters:', $filters);
-        $ads = $service->getPublishedAds($filters);
-        \Log::info('Ads count returned:', ['count' => $ads->count()]);
-        \Log::info('First ad type (if exists):', [
-            'type' => $ads->first()?->type?->value ?? 'no ads'
-        ]);
+        
+        // Получаем пагинированные объявления (теперь с Scout поддержкой)
+        $adsData = $service->getPublishedAds($filters, 10);
+        
         return Inertia::render('Dashboard', [
-            'ads' => $ads,
+            // Передаем структуру пагинации
+            'ads' => [
+                'data' => $adsData->items(), // Сами объявления
+                'current_page' => $adsData->currentPage(),
+                'last_page' => $adsData->lastPage(),
+                'per_page' => $adsData->perPage(),
+                'total' => $adsData->total(),
+                'from' => $adsData->firstItem(),
+                'to' => $adsData->lastItem(),
+            ],
             'filters' => $filters,
         ]);
     }

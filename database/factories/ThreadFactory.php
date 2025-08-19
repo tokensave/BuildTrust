@@ -14,7 +14,7 @@ class ThreadFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'ad_id' => \App\Models\Ad::factory(),
         ];
     }
 }
