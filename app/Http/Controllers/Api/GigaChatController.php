@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
-class AiController extends Controller
+class GigaChatController extends Controller
 {
     public function __construct(
         private readonly GigaChatService $gigaChatService
@@ -71,14 +71,7 @@ class AiController extends Controller
                 ]
             ]);
 
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка валидации',
-                'errors' => $e->errors()
-            ], 422);
-
-        } catch (\Exception $e) {
+        }  catch (\Exception $e) {
             Log::error('AI: Ошибка анализа компании', [
                 'inn' => $request->input('inn'),
                 'error' => $e->getMessage(),
@@ -98,19 +91,6 @@ class AiController extends Controller
     public function checkCounterparty(Request $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'inn' => ['required', 'string', 'min:10', 'max:12', 'regex:/^\d+$/'],
-                'company_name' => ['required', 'string', 'max:500'],
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Ошибка валидации',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
             $inn = $request->input('inn');
             $companyName = $request->input('company_name');
 
@@ -126,13 +106,6 @@ class AiController extends Controller
                 'success' => true,
                 'data' => $result
             ]);
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ошибка валидации',
-                'errors' => $e->errors()
-            ], 422);
 
         } catch (\Exception $e) {
             Log::error('AI: Ошибка проверки контрагента', [

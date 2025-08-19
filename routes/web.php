@@ -9,6 +9,8 @@ Route::get('/', static function () {
     return Inertia::render('Welcome');
 })->name('home');
 
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/deals', [DealController::class, 'index'])->name('user.deals.index');
     Route::post('/deals/{ad}', [DealController::class, 'store'])->name('deals.store');

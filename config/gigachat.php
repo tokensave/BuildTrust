@@ -1,31 +1,15 @@
 <?php
 
 return [
-    // API настройки
-    'api_key' => env('GIGA_CHAT_API_KEY'),
-    'client_secret' => env('GIGA_CHAT_CLIENT_SECRET'),
-    'base_uri' => env('GIGA_CHAT_BASE_URI', 'https://gigachat.devices.sberbank.ru/api/v1'),
-    'auth_uri' => env('GIGA_CHAT_AUTH_URI', 'https://ngw.devices.sberbank.ru:9443/api/v2'),
-    'model' => env('GIGA_CHAT_MODEL', 'GigaChat:latest'),
-    'scope' => env('GIGA_CHAT_SCOPE', 'GIGACHAT_API_PERS'),
-    
+
     // Настройки для библиотеки edvardpotter/gigachat-php-sdk
     'sdk' => [
         'client_id' => env('GIGACHAT_CLIENT_ID'),
-        'client_secret' => env('GIGACHAT_CLIENT_SECRET'), 
+        'client_secret' => env('GIGACHAT_CLIENT_SECRET'),
         'cert_path' => env('GIGACHAT_CERT_PATH', base_path('russiantrustedca.pem')),
         'scope' => env('GIGACHAT_SCOPE', 'GIGACHAT_API_PERS'),
         'use_ssl' => env('GIGACHAT_USE_SSL', true),
     ],
-
-    // Timeout настройки
-    'timeout' => env('GIGA_CHAT_TIMEOUT', 30),
-    'connect_timeout' => env('GIGA_CHAT_CONNECT_TIMEOUT', 10),
-
-    // SSL настройки
-    'ssl_verify' => env('GIGA_CHAT_SSL_VERIFY', true),
-    'ca_bundle_path' => env('GIGA_CHAT_CA_BUNDLE_PATH', storage_path('certificates/gigachat_ca_bundle.crt')),
-
     // Промпты для различных задач
     'prompts' => [
         'company_analysis' => [
