@@ -6,6 +6,7 @@ use App\Enums\AdEnums\AdCategoryEnum;
 use App\Enums\AdEnums\AdSubcategoryEnum;
 use App\Enums\AdEnums\AdTypeEnum;
 use App\Http\Controllers\Controller;
+use App\Services\Ad\AdService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

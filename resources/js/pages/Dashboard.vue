@@ -1,15 +1,24 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, usePage, router } from '@inertiajs/vue3';
 import { Table, TableRow, TableCell, TableHeader, TableHead, TableBody } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { computed, ref } from 'vue';
 import AdGalleryModal from '@/components/AdGalleryModal.vue';
 import AdFilters from '@/components/AdFilters.vue';
-import type { Ad, SharedData, User, AdFilter } from '@/types';
+import type { Ad, SharedData, User, AdFilter, Paginated } from '@/types';
+import AdPagination from '@/components/ads/AdPagination.vue';
 
-const page = usePage<SharedData & { ads: Ad[], filters?: AdFilter }>();
-const ads = computed(() => page.props.ads);
+const page = usePage<SharedData & { ads: Paginated<Ad>, filters?: AdFilter }>(); // Используем общий тип
+const ads = computed(() => page.props.ads.data); // Теперь берем data из пагинации
+const pagination = computed(() => ({
+    currentPage: page.props.ads.current_page,
+    lastPage: page.props.ads.last_page,
+    perPage: page.props.ads.per_page,
+    total: page.props.ads.total,
+    from: page.props.ads.from,
+    to: page.props.ads.to,
+}));
 const user = computed(() => page.props.auth.user as User); // ✅ Реактивно
 const filters = computed(() => page.props.filters || {});
 
@@ -41,6 +50,17 @@ const prevImage = () => {
 };
 
 
+const handlePageChange = (pageNumber: number) => {
+    const params = {
+        ...filters.value,
+        page: pageNumber,
+    };
+
+    router.get('/dashboard', params, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
 </script>
 
 <template>
@@ -50,7 +70,7 @@ const prevImage = () => {
             <!-- Компонент фильтров -->
             <AdFilters
                 :filters="filters"
-                :total-count="ads.length"
+                :total-count="pagination.total"
             />
 
             <!-- Таблица объявлений -->
@@ -151,6 +171,18 @@ const prevImage = () => {
                         </TableRow>
                     </TableBody>
                 </Table>
+
+                <!-- Пагинация -->
+                <AdPagination
+                    v-if="pagination.lastPage > 1"
+                    :current-page="pagination.currentPage"
+                    :last-page="pagination.lastPage"
+                    :total="pagination.total"
+                    :from="pagination.from"
+                    :to="pagination.to"
+                    :filters="filters"
+                    @change-page="handlePageChange"
+                />
             </div>
 
             <!-- Пустое состояние -->
