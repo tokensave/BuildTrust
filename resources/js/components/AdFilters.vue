@@ -22,7 +22,6 @@ import { Separator } from '@/components/ui/separator'
 import {
     Collapsible,
     CollapsibleContent,
-    CollapsibleTrigger,
 } from '@/components/ui/collapsible'
 
 // Иконки (если у вас есть lucide-vue-next)
@@ -195,9 +194,6 @@ const removePriceFilter = () => {
             <div class="flex items-center gap-2">
                 <h2 class="text-lg font-semibold">
                     Объявления
-                    <span v-if="totalCount" class="text-muted-foreground font-normal">
-            ({{ totalCount }})
-          </span>
                 </h2>
                 <div v-if="isLoading" class="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
             </div>
