@@ -22,10 +22,10 @@ class MainController extends Controller
 
         // Убираем пустые значения
         $filters = array_filter($filters);
-        
+
         // Получаем пагинированные объявления (теперь с Scout поддержкой)
         $adsData = $service->getPublishedAds($filters, 10);
-        
+
         return Inertia::render('Dashboard', [
             // Передаем структуру пагинации
             'ads' => [

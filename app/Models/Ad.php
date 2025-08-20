@@ -74,19 +74,19 @@ class Ad extends Model implements HasMedia
     public function getFormattedCategoryAttribute(): string
     {
         $parts = [];
-        
+
         if ($this->type) {
             $parts[] = $this->type->label();
         }
-        
+
         if ($this->category) {
             $parts[] = $this->category->label();
         }
-        
+
         if ($this->subcategory) {
             $parts[] = $this->subcategory->label();
         }
-        
+
         return implode(' → ', $parts);
     }
 
@@ -131,11 +131,11 @@ class Ad extends Model implements HasMedia
         if ($minPrice !== null) {
             $query->where('price', '>=', $minPrice);
         }
-        
+
         if ($maxPrice !== null) {
             $query->where('price', '<=', $maxPrice);
         }
-        
+
         return $query;
     }
 
