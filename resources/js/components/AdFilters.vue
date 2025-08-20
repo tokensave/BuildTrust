@@ -137,6 +137,7 @@ watch(() => currentFilters.value.search, () => {
 // Применение фильтров
 // Применение фильтров
 const applyFilters = () => {
+    console.log('Отправляю фильтры:', currentFilters.value);
     isLoading.value = true
 
     // Создаем копию фильтров и удаляем "all" значения
@@ -447,16 +448,16 @@ const removePriceFilter = () => {
                             </div>
 
                             <!-- Срочные -->
-                            <div class="flex items-center space-x-2 pt-6">
+                            <div class="flex items-center space-x-2 pt-6 cursor-pointer" @click="() => {
+                                    currentFilters.urgent = !currentFilters.urgent;
+                                    debouncedApplyFilters();}">
                                 <Checkbox
-                                    id="urgent"
-                                    v-model:checked="currentFilters.urgent"
-                                    @update:checked="debouncedApplyFilters"
+                                    :model-value="currentFilters.urgent"
+                                    class="pointer-events-none"
                                 />
-                                <Label for="urgent" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Только срочные
-                                </Label>
+                                <span class="text-sm">Только срочные</span>
                             </div>
+
                         </div>
                     </CardContent>
                 </Card>

@@ -5,6 +5,7 @@ import { Table, TableRow, TableCell, TableHeader, TableHead, TableBody } from '@
 import { Badge } from '@/components/ui/badge';
 import { computed, ref } from 'vue';
 import AdGalleryModal from '@/components/AdGalleryModal.vue';
+import FeaturesDisplay from '@/components/FeaturesDisplay.vue';
 import AdFilters from '@/components/AdFilters.vue';
 import type { Ad, SharedData, User, AdFilter, Paginated } from '@/types';
 import AdPagination from '@/components/ads/AdPagination.vue';
@@ -61,6 +62,13 @@ const handlePageChange = (pageNumber: number) => {
         preserveScroll: true,
     });
 };
+
+const truncateText = (text: string, length: number): string => {
+    if (!text) return '';
+    if (text.length <= length) return text;
+    return text.slice(0, length).trim() + '...';
+};
+
 </script>
 
 <template>
@@ -132,22 +140,16 @@ const handlePageChange = (pageNumber: number) => {
                                     @click="$inertia.visit(route('user.ads.show', [user.id, ad.id]))"
                                     style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;"
                                 >
-                                    {{ ad.description }}
+                                    {{ truncateText(ad.description, 50) }}
                                 </div>
 
                                 <!-- Дополнительные характеристики -->
-                                <div v-if="ad.features && ad.features.length > 0" class="flex flex-wrap gap-1 mt-2">
-                                    <Badge
-                                        v-for="feature in ad.features.slice(0, 3)"
-                                        :key="feature"
-                                        variant="outline"
-                                        class="text-xs px-2 py-0.5"
-                                    >
-                                        {{ feature }}
-                                    </Badge>
-                                    <span v-if="ad.features.length > 3" class="text-xs text-muted-foreground">
-                                        +{{ ad.features.length - 3 }}
-                                    </span>
+                                <div class="mt-2">
+                                    <FeaturesDisplay
+                                        :features="ad.features"
+                                        :max-visible="3"
+                                        size="sm"
+                                    />
                                 </div>
 
                                 <!-- Дата создания -->

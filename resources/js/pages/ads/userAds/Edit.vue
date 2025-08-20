@@ -18,6 +18,7 @@ import {
     SUBCATEGORIES_BY_CATEGORY,
     AD_STATUS_OPTIONS
 } from '@/types/ad-enums';
+import FeaturesSelector from '@/components/FeaturesSelector.vue';
 
 const page = usePage<SharedData & { ad: Ad }>();
 const user = page.props.auth.user as User;
@@ -39,6 +40,7 @@ const form = useForm({
     status: ad.status,
     location: ad.location || '',
     is_urgent: ad.is_urgent,
+    features: ad.features || [],
     images: [] as File[],
     deleted_media_ids: [] as number[],
 });
@@ -207,6 +209,16 @@ const handleSubmit = () => {
                             <Label for="location" class="mb-1 block text-sm font-medium">Местоположение</Label>
                             <Input id="location" v-model="form.location" type="text"/>
                             <InputError :message="form.errors.location" />
+                        </div>
+
+                        <!-- Характеристики -->
+                        <div>
+                            <FeaturesSelector
+                                v-model="form.features"
+                                :category="form.category"
+                                :max-features="5"
+                            />
+                            <InputError :message="form.errors.features" />
                         </div>
 
                         <div class="flex items-center space-x-2">

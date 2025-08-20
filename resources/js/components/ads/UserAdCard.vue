@@ -4,6 +4,7 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import { Trash2 } from 'lucide-vue-next';
 import type { SharedData, User } from '@/types';
 import { toast } from 'vue-sonner';
+import FeaturesDisplay from '@/components/FeaturesDisplay.vue';
 
 // Получаем авторизованного пользователя из глобальных пропсов
 const page = usePage<SharedData>();
@@ -131,17 +132,19 @@ function deleteAd() {
                 </CardDescription>
                 
                 <!-- Характеристики -->
-                <div v-if="props.ad.features && props.ad.features.length > 0" class="flex flex-wrap gap-1 mt-2">
-                    <span 
-                        v-for="feature in props.ad.features.slice(0, 3)" 
-                        :key="feature"
-                        class="bg-white/20 text-white px-2 py-0.5 rounded text-xs"
-                    >
-                        {{ feature }}
-                    </span>
-                    <span v-if="props.ad.features.length > 3" class="text-xs text-gray-300">
-                        +{{ props.ad.features.length - 3 }}
-                    </span>
+                <div class="mt-2">
+                    <div v-if="props.ad.features && props.ad.features.length > 0" class="flex flex-wrap gap-1">
+                        <span 
+                            v-for="feature in props.ad.features.slice(0, 3)" 
+                            :key="feature"
+                            class="bg-white/20 text-white px-2 py-0.5 rounded text-xs"
+                        >
+                            {{ feature }}
+                        </span>
+                        <span v-if="props.ad.features.length > 3" class="text-xs text-gray-300">
+                            +{{ props.ad.features.length - 3 }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </Link>
