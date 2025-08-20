@@ -62,6 +62,13 @@ const handlePageChange = (pageNumber: number) => {
         preserveScroll: true,
     });
 };
+
+const truncateText = (text: string, length: number): string => {
+    if (!text) return '';
+    if (text.length <= length) return text;
+    return text.slice(0, length).trim() + '...';
+};
+
 </script>
 
 <template>
@@ -133,14 +140,14 @@ const handlePageChange = (pageNumber: number) => {
                                     @click="$inertia.visit(route('user.ads.show', [user.id, ad.id]))"
                                     style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;"
                                 >
-                                    {{ ad.description }}
+                                    {{ truncateText(ad.description, 50) }}
                                 </div>
 
                                 <!-- Дополнительные характеристики -->
                                 <div class="mt-2">
-                                    <FeaturesDisplay 
-                                        :features="ad.features" 
-                                        :max-visible="3" 
+                                    <FeaturesDisplay
+                                        :features="ad.features"
+                                        :max-visible="3"
                                         size="sm"
                                     />
                                 </div>
