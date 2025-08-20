@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\AdEnums\AdCategoryEnum;
 use App\Enums\AdEnums\AdSubcategoryEnum;
 use App\Enums\AdEnums\AdTypeEnum;
+use App\Enums\AdEnums\AdFeaturesEnum;
 use App\Http\Controllers\Controller;
 use App\Services\Ad\AdService;
 use Illuminate\Http\JsonResponse;
@@ -116,5 +117,26 @@ class FilterController extends Controller
         ];
 
         return response()->json($locations);
+    }
+
+    /**
+     * Получить доступные характеристики по категории
+     */
+    public function getFeaturesByCategory(Request $request): JsonResponse
+    {
+        $category = $request->get('category');
+
+        if (!$category) {
+            return response()->json(['error' => 'Category parameter is required'], 400);
+        }
+
+        try {
+            $categoryEnum = AdCategoryEnum::from($category);
+            $features = AdFeaturesEnum::toArrayByCategory($categoryEnum);
+
+            return response()->json($features);
+        } catch (\ValueError $e) {
+            return response()->json(['error' => 'Invalid category'], 400);
+        }
     }
 }

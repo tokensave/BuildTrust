@@ -181,6 +181,15 @@ class Ad extends Model implements HasMedia
             });
         }
 
+        if (!empty($filters['features'])) {
+            $features = is_array($filters['features']) ? $filters['features'] : [$filters['features']];
+            $query->where(function($q) use ($features) {
+                foreach ($features as $feature) {
+                    $q->whereJsonContains('features', $feature);
+                }
+            });
+        }
+
         return $query;
     }
 }
