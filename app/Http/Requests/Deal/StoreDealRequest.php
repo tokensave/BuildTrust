@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Deal;
 
-use App\Enums\DealEnums\DealStatusEnum;
+use App\Domain\Deal\ValueObjects\DealStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -17,7 +17,7 @@ class StoreDealRequest extends FormRequest
     {
         if ($this->input('status') === null) {
             $this->merge([
-                'status' => DealStatusEnum::PENDING->value,
+                'status' => DealStatus::PENDING->value,
             ]);
         }
     }
@@ -26,7 +26,7 @@ class StoreDealRequest extends FormRequest
     {
         return [
             'notes' => ['nullable', 'string'],
-            'status' => ['nullable', Rule::enum(DealStatusEnum::class)],
+            'status' => ['nullable', Rule::enum(DealStatus::class)],
             'documents.*' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
         ];
     }

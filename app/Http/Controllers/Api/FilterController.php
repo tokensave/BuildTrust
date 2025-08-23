@@ -7,7 +7,7 @@ use App\Enums\AdEnums\AdSubcategoryEnum;
 use App\Enums\AdEnums\AdTypeEnum;
 use App\Enums\AdEnums\AdFeaturesEnum;
 use App\Enums\AdEnums\AdsStatusEnum;
-use App\Enums\DealEnums\DealStatusEnum;
+use App\Domain\Deal\ValueObjects\DealStatus;
 use App\Http\Controllers\Controller;
 use App\Services\Ad\AdService;
 use Illuminate\Http\JsonResponse;
@@ -156,7 +156,7 @@ class FilterController extends Controller
             
             'adTypes' => AdTypeEnum::toArray(),
             
-            'dealStatuses' => collect(DealStatusEnum::cases())->map(fn($case) => [
+            'dealStatuses' => collect(DealStatus::cases())->map(fn($case) => [
                 'value' => $case->value,
                 'label' => $case->label(),
                 'color' => $case->color()

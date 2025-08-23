@@ -6,7 +6,7 @@ declare(ticks=1000);
 namespace App\Services\Deal;
 
 use App\DTO\Deal\StoreDealData;
-use App\Enums\DealEnums\DealStatusEnum;
+use App\Domain\Deal\ValueObjects\DealStatus;
 use App\Events\DealCreatedOrUpdatedEvent;
 use App\Models\Ad;
 use App\Models\Deal;
@@ -82,7 +82,7 @@ class DealService
 
     public function getStatuses(): array
     {
-        return collect(DealStatusEnum::cases())->mapWithKeys(function ($case) {
+        return collect(DealStatus::cases())->mapWithKeys(function ($case) {
             return [
                 $case->value => [
                     'value' => $case->value,

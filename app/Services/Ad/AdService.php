@@ -8,7 +8,7 @@ use App\DTO\Ad\GetAdData;
 use App\DTO\Ad\ShowAdData;
 use App\DTO\Ad\StoreAdData;
 use App\DTO\Ad\UpdateAdData;
-use App\Enums\DealEnums\DealStatusEnum;
+use App\Domain\Deal\ValueObjects\DealStatus;
 use App\Models\Ad;
 use App\Models\User;
 use App\Services\Media\MediaService;
@@ -164,7 +164,7 @@ class AdService
     {
         // Возвращает true, если есть хотя бы одна сделка не в статусе CANCELED
         return $ad->deals()
-            ->where('status', '!=', DealStatusEnum::CANCELED->value)
+            ->where('status', '!=', DealStatus::CANCELED->value)
             ->exists();
     }
 }

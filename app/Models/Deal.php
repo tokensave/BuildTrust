@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\DealEnums\DealStatusEnum;
+use App\Domain\Deal\ValueObjects\DealStatus;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,7 +26,7 @@ class Deal extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'status' => DealStatusEnum::class,
+        'status' => DealStatus::class,
     ];
 
     public function ad(): BelongsTo

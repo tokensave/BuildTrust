@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Deal;
 
-use App\Enums\DealEnums\DealStatusEnum;
+use App\Domain\Deal\ValueObjects\DealStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +16,7 @@ class UpdateDealStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', Rule::enum(DealStatusEnum::class)],
+            'status' => ['required', Rule::enum(DealStatus::class)],
         ];
     }
 }

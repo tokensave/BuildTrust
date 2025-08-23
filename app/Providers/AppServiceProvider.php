@@ -13,7 +13,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Привязываем интерфейсы репозиториев к их реализациям
+        $this->app->bind(
+            \App\Domain\Deal\Contracts\DealRepositoryInterface::class,
+            \App\Infrastructure\Deal\Repositories\EloquentDealRepository::class
+        );
     }
 
     /**
