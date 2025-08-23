@@ -1,16 +1,16 @@
 /**
  * 📋 useEnums - Управление справочными данными (enum'ы)
- * 
+ *
  * Централизованное получение и кеширование всех enum'ов с бэкенда.
  * Заменяет хардкод на фронтенде единым источником истины.
- * 
+ *
  * @example
  * ```typescript
  * const { enums, loading, getStatusLabel, getStatusColor } = useEnums()
- * 
+ *
  * // Получение данных
  * await loadEnums()
- * 
+ *
  * // Использование
  * const statusLabel = getStatusLabel('published', 'ad')
  * const statusColor = getStatusColor('pending', 'deal')
@@ -37,7 +37,7 @@ const enums = ref<AppEnums>({
     categories_structure: {}
 })
 
-const loading = ref(false)
+const isLoading = ref(false)
 const error = ref<string | null>(null)
 
 export function useEnums() {
@@ -45,13 +45,13 @@ export function useEnums() {
     const loadEnums = async () => {
         if (enums.value.adStatuses.length > 0) return // Уже загружены
 
-        loading.value = true
+        isLoading.value = true
         error.value = null
 
         try {
             const response = await fetch('/api/filters/all-enums')
             if (!response.ok) throw new Error('Ошибка загрузки справочников')
-            
+
             const data = await response.json()
             enums.value = {
                 adStatuses: data.adStatuses || [],
@@ -63,7 +63,7 @@ export function useEnums() {
             error.value = err instanceof Error ? err.message : 'Неизвестная ошибка'
             console.error('Ошибка загрузки enum\'ов:', err)
         } finally {
-            loading.value = false
+            isLoading.value = false
         }
     }
 
@@ -86,21 +86,21 @@ export function useEnums() {
     const getCategoriesByType = (type: string) => {
         // Логика фильтрации категорий по типу
         const allCategories = enums.value.categories_structure
-        
+
         if (type === 'goods') {
             return Object.fromEntries(
-                Object.entries(allCategories).filter(([key]) => 
+                Object.entries(allCategories).filter(([key]) =>
                     ['materials', 'tools', 'equipment'].includes(key)
                 )
             )
         } else if (type === 'services') {
             return Object.fromEntries(
-                Object.entries(allCategories).filter(([key]) => 
+                Object.entries(allCategories).filter(([key]) =>
                     ['construction', 'repair', 'design'].includes(key)
                 )
             )
         }
-        
+
         return allCategories
     }
 
@@ -115,7 +115,7 @@ export function useEnums() {
     return {
         // Состояние
         enums,
-        loading,
+        isLoading: isLoading,
         error,
         isLoaded,
 

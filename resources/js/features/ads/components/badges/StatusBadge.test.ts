@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import StatusBadge from './StatusBadge.vue';
+import StatusBadge from '@/shared/components/feedback/StatusBadge.vue';
 
 // Mock useEnums composable
 const mockUseEnums = vi.fn();
@@ -11,19 +11,24 @@ vi.mock('@/shared/composables/data/useEnums', () => ({
 describe('StatusBadge', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        
-        // Default mock implementation
+
+        // Default mock implementation using existing methods
         mockUseEnums.mockReturnValue({
-            getEnumItemByValue: vi.fn((enumType: string, value: string) => {
-                if (enumType === 'adStatuses') {
-                    const statusMap = {
-                        'active': { label: 'Активное', color: 'green' },
-                        'inactive': { label: 'Неактивное', color: 'gray' },
-                        'pending': { label: 'На модерации', color: 'yellow' },
-                    };
-                    return statusMap[value as keyof typeof statusMap] || null;
-                }
-                return null;
+            getStatusLabel: vi.fn((status: string, type: string = 'ad') => {
+                const statusMap = {
+                    'active': 'Активное',
+                    'inactive': 'Неактивное',
+                    'pending': 'На модерации',
+                };
+                return statusMap[status as keyof typeof statusMap] || status;
+            }),
+            getStatusColor: vi.fn((status: string, type: string = 'ad') => {
+                const colorMap = {
+                    'active': 'green',
+                    'inactive': 'gray',
+                    'pending': 'yellow',
+                };
+                return colorMap[status as keyof typeof colorMap] || 'gray';
             }),
         });
     });
@@ -32,7 +37,7 @@ describe('StatusBadge', () => {
         const wrapper = mount(StatusBadge, {
             props: {
                 status: 'active',
-                enumType: 'adStatuses',
+                enumType: 'ad',
             },
         });
 
@@ -45,7 +50,7 @@ describe('StatusBadge', () => {
         const wrapper = mount(StatusBadge, {
             props: {
                 status: 'pending',
-                enumType: 'adStatuses',
+                enumType: 'ad',
             },
         });
 
@@ -56,13 +61,14 @@ describe('StatusBadge', () => {
 
     it('should render fallback when status not found', () => {
         mockUseEnums.mockReturnValue({
-            getEnumItemByValue: vi.fn(() => null),
+            getStatusLabel: vi.fn((status: string) => status),
+            getStatusColor: vi.fn(() => 'gray'),
         });
 
         const wrapper = mount(StatusBadge, {
             props: {
                 status: 'unknown',
-                enumType: 'adStatuses',
+                enumType: 'ad',
             },
         });
 
@@ -75,7 +81,7 @@ describe('StatusBadge', () => {
         const wrapper = mount(StatusBadge, {
             props: {
                 status: 'active',
-                enumType: 'adStatuses',
+                enumType: 'ad',
                 class: 'custom-class',
             },
         });
@@ -83,18 +89,23 @@ describe('StatusBadge', () => {
         expect(wrapper.classes()).toContain('custom-class');
     });
 
-    it('should call getEnumItemByValue with correct parameters', () => {
-        const mockGetEnumItem = vi.fn(() => ({ label: 'Test', color: 'blue' }));
+    it('should call getStatusLabel and getStatusColor with correct parameters', () => {
+        const mockGetLabel = vi.fn(() => 'Test Status');
+        const mockGetColor = vi.fn(() => 'blue');
+
         mockUseEnums.mockReturnValue({
-            getEnumItemByValue: mockGetEnumItem,
+            getStatusLabel: mockGetLabel,
+            getStatusColor: mockGetColor,
         });
 
         mount(StatusBadge, {
             props: {
                 status: 'test-status',
-                enumType: 'testEnums',
+                enumType: 'ad',
             },
         });
 
-        expect(mockGetEnumItem).toHaveBeenCalledWith('testEnums', 'test-status');
+        expect(mockGetLabel).toHaveBeenCalledWith('test-status', 'ad');
+        expect(mockGetColor).toHaveBeenCalledWith('test-status', 'ad');
     });
+});

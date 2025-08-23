@@ -1,10 +1,10 @@
 <script setup lang="ts">
 /**
  * 🏷️ StatusBadge - Универсальный компонент для отображения статусов
- * 
+ *
  * Заменяет дублирование логики статусов в разных компонентах.
  * Получает данные о цветах и лейблах из централизованного источника.
- * 
+ *
  * @example
  * ```vue
  * <StatusBadge :status="ad.status" type="ad" />
@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
     variant: 'default'
 })
 
-const { getStatusLabel, getStatusColor, enums } = useEnums()
+const { getStatusLabel, getStatusColor } = useEnums()
 
 // Получаем лейбл и цвет статуса
 const statusLabel = computed(() => getStatusLabel(props.status, props.type))
@@ -47,7 +47,7 @@ const sizeClasses = computed(() => {
 </script>
 
 <template>
-    <Badge 
+    <Badge
         :class="[
             statusColor,
             sizeClasses,
