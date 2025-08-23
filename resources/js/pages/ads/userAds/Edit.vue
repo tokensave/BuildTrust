@@ -8,17 +8,12 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/AppLayout.vue';
 import type { Ad, BreadcrumbItem, SharedData, User } from '@/types';
 import { useForm, usePage } from '@inertiajs/vue3';
-import ImagePreviewUploader from '@/components/ImagePreviewUploader.vue';
-import InputError from '@/components/InputError.vue';
+import ImagePreviewUploader from '@/shared/components/forms/ImagePreviewUploader.vue'
+import InputError from '@/shared/components/forms/InputError.vue'
 import { toast } from 'vue-sonner';
-import { computed, watch } from 'vue';
-import {
-    AD_TYPES,
-    ALL_CATEGORIES,
-    SUBCATEGORIES_BY_CATEGORY,
-    AD_STATUS_OPTIONS
-} from '@/types/ad-enums';
-import FeaturesSelector from '@/components/ads/FeaturesSelector.vue';
+import { computed, watch, onMounted } from 'vue';
+import { useEnums } from '@/shared/composables/data/useEnums';
+import FeaturesSelector from '@/features/ads/components/forms/FeaturesSelector.vue'
 
 const page = usePage<SharedData & { ad: Ad }>();
 const user = page.props.auth.user as User;
@@ -45,26 +40,28 @@ const form = useForm({
     deleted_media_ids: [] as number[],
 });
 
+// Композаблы для работы с enum'ами
+const { 
+    enums, 
+    loadEnums, 
+    getAdTypes, 
+    getCategoriesByType, 
+    getSubcategoriesByCategory 
+} = useEnums();
+
+// Загружаем enum'ы при монтировании
+onMounted(async () => {
+    await loadEnums();
+});
+
 // Вычисляем доступные категории на основе типа
 const availableCategories = computed(() => {
-    if (form.type === 'goods') {
-        return ALL_CATEGORIES.filter(cat =>
-            ['materials', 'tools', 'equipment'].includes(cat.value)
-        );
-    } else if (form.type === 'services') {
-        return ALL_CATEGORIES.filter(cat =>
-            ['construction', 'repair', 'design'].includes(cat.value)
-        );
-    }
-    return ALL_CATEGORIES;
+    return getCategoriesByType(form.type);
 });
 
 // Вычисляем доступные подкатегории на основе выбранной категории
 const availableSubcategories = computed(() => {
-    if (form.category && SUBCATEGORIES_BY_CATEGORY[form.category as keyof typeof SUBCATEGORIES_BY_CATEGORY]) {
-        return SUBCATEGORIES_BY_CATEGORY[form.category as keyof typeof SUBCATEGORIES_BY_CATEGORY];
-    }
-    return [];
+    return getSubcategoriesByCategory(form.category);
 });
 
 // Сбрасываем категорию и подкатегорию при смене типа
@@ -128,7 +125,7 @@ const handleSubmit = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem
-                                            v-for="option in AD_STATUS_OPTIONS"
+                                            v-for="option in enums.adStatuses"
                                             :key="option.value"
                                             :value="option.value"
                                         >
@@ -149,7 +146,7 @@ const handleSubmit = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem
-                                            v-for="option in AD_TYPES"
+                                            v-for="option in getAdTypes"
                                             :key="option.value"
                                             :value="option.value"
                                         >
@@ -162,7 +159,7 @@ const handleSubmit = () => {
                                     v-if="form.type"
                                     class="text-xs text-muted-foreground mt-1 min-h-[20px]"
                                 >
-                                    {{ AD_TYPES.find(t => t.value === form.type)?.description }}
+                                    {{ getAdTypes.find(t => t.value === form.type)?.description }}
                                 </div>
                             </div>
 
@@ -174,11 +171,11 @@ const handleSubmit = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem
-                                            v-for="option in availableCategories"
-                                            :key="option.value"
-                                            :value="option.value"
+                                            v-for="[key, category] in Object.entries(availableCategories)"
+                                            :key="key"
+                                            :value="key"
                                         >
-                                            {{ option.label }}
+                                            {{ category.label }}
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
@@ -193,11 +190,11 @@ const handleSubmit = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem
-                                            v-for="option in availableSubcategories"
-                                            :key="option.value"
-                                            :value="option.value"
+                                            v-for="[key, subcategory] in Object.entries(availableSubcategories)"
+                                            :key="key"
+                                            :value="key"
                                         >
-                                            {{ option.label }}
+                                            {{ subcategory.label }}
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>

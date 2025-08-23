@@ -4,11 +4,11 @@ import { Head, usePage, router } from '@inertiajs/vue3';
 import { Table, TableRow, TableCell, TableHeader, TableHead, TableBody } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { computed, ref } from 'vue';
-import AdGalleryModal from '@/components/ads/AdGalleryModal.vue';
-import FeaturesDisplay from '@/components/ads/FeaturesDisplay.vue';
-import AdFilters from '@/components/ads/AdFilters.vue';
+import AdGalleryModal from '@/features/ads/components/modals/AdGalleryModal.vue'
+import FeaturesDisplay from '@/features/ads/components/display/FeaturesDisplay.vue'
+import AdFilters from '@/features/ads/components/forms/AdFilters.vue'
 import type { Ad, SharedData, User, AdFilter, Paginated } from '@/types';
-import AdPagination from '@/components/ads/AdPagination.vue';
+import AdPagination from '@/features/ads/components/navigation/AdPagination.vue';
 import { truncateText } from '@/composables/useInitials';
 
 const page = usePage<SharedData & { ads: Paginated<Ad>, filters?: AdFilter }>(); // Используем общий тип

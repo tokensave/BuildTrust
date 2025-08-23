@@ -30,4 +30,10 @@ export default defineConfig({
             'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
         },
     },
+    test: {
+        globals: true,
+        environment: 'happy-dom',
+        setupFiles: ['./resources/js/test/setup.ts'],
+        include: ['resources/js/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    },
 });

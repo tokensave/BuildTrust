@@ -3,12 +3,12 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import type { Ad, Company, User } from '@/types';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import AdGalleryModal from '@/components/ads/AdGalleryModal.vue';
-import CompanyCard from '@/components/company/CompanyCard.vue';
-import DealCreateModal from '@/components/deal/DealCreateModal.vue';
+import AdGalleryModal from '@/features/ads/components/modals/AdGalleryModal.vue'
+import CompanyCard from '@/features/companies/components/cards/CompanyCard.vue'
+import DealCreateModal from '@/features/deals/components/modals/DealCreateModal.vue'
 import { Button } from '@/components/ui/button';
 import { Handshake, MessageSquareMore } from 'lucide-vue-next';
-import MessageCreateModal from '@/components/message/MessageCreateModal.vue';
+import MessageCreateModal from '@/features/chat/components/MessageCreateModal.vue'
 
 const page = usePage<{ ad: Ad & { user: User & { company?: Company } } }>();
 const ad = page.props.ad;

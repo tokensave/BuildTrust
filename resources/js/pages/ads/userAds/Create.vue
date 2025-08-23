@@ -1,241 +1,252 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem, type SharedData, type User } from '@/types';
-import { useForm, usePage } from '@inertiajs/vue3';
-import ImagePreviewUploader from '@/components/ImagePreviewUploader.vue';
-import InputError from '@/components/InputError.vue';
-import { toast } from 'vue-sonner';
-import { computed, watch } from 'vue';
-import {
-    AD_TYPES,
-    ALL_CATEGORIES,
-    SUBCATEGORIES_BY_CATEGORY,
-    AD_STATUS_OPTIONS
-} from '@/types/ad-enums';
-import FeaturesSelector from '@/components/ads/FeaturesSelector.vue';
+/**
+ * 📝 Create Ad Page - Страница создания объявления
+ *
+ * Рефакторинг с использованием новых композаблов:
+ * - useAdForm для логики формы
+ * - useEnums для получения справочных данных
+ * - FormField для унифицированных полей
+ */
 
-const page = usePage<SharedData>();
-const user = page.props.auth.user as User;
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
+import AppLayout from '@/layouts/AppLayout.vue'
+import { type BreadcrumbItem, type SharedData, type User } from '@/types'
+import { usePage } from '@inertiajs/vue3'
+import { onMounted } from 'vue'
+
+// Новые импорты
+import { useAdForm } from '@/features/ads/composables/useAdForm'
+import { useEnums } from '@/shared/composables/data/useEnums'
+import FormField from '@/shared/components/forms/FormField.vue'
+import ImagePreviewUploader from '@/shared/components/forms/ImagePreviewUploader.vue'
+import FeaturesSelector from '@/features/ads/components/forms/FeaturesSelector.vue'
+
+const page = usePage<SharedData>()
+const user = page.props.auth.user as User
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Главная', href: '/dashboard', },
-    { title: 'Мои объявления', href: route('user.ads.index', user.id), },
-    { title: 'Новое объявление', href: route('user.ads.create', user.id), }// текущая страница},
-];
+    { title: 'Главная', href: '/dashboard' },
+    { title: 'Мои объявления', href: route('user.ads.index', user.id) },
+    { title: 'Новое объявление', href: route('user.ads.create', user.id) }
+]
 
-const form = useForm({
-    title: '',
-    type: '',
-    category: '',
-    subcategory: '',
-    description: '',
-    price: null as number | null,
-    status: 'draft',
-    images: [] as File[],
-    is_urgent: false,
-    location: '',
-    features: [] as string[]
-});
+// Композаблы
+const {
+    form,
+    availableCategories,
+    availableSubcategories,
+    submitCreate,
+    saveAsDraft,
+    publish,
+    addImages,
+    removeImage,
+    addFeature,
+    removeFeature,
+    isFormValid
+} = useAdForm()
 
-// Вычисляем доступные категории на основе типа
-const availableCategories = computed(() => {
-    if (form.type === 'goods') {
-        return ALL_CATEGORIES.filter(cat =>
-            ['materials', 'tools', 'equipment'].includes(cat.value)
-        );
-    } else if (form.type === 'services') {
-        return ALL_CATEGORIES.filter(cat =>
-            ['construction', 'repair', 'design'].includes(cat.value)
-        );
-    }
-    return ALL_CATEGORIES;
-});
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { enums, loadEnums, getAdTypes } = useEnums()
 
-// Вычисляем доступные подкатегории на основе выбранной категории
-const availableSubcategories = computed(() => {
-    if (form.category && SUBCATEGORIES_BY_CATEGORY[form.category as keyof typeof SUBCATEGORIES_BY_CATEGORY]) {
-        return SUBCATEGORIES_BY_CATEGORY[form.category as keyof typeof SUBCATEGORIES_BY_CATEGORY];
-    }
-    return [];
-});
+// Загружаем enum'ы при монтировании
+onMounted(async () => {
+    await loadEnums()
+})
 
-// Сбрасываем категорию и подкатегорию при смене типа
-watch(() => form.type, () => {
-    form.category = '';
-    form.subcategory = '';
-});
-
-// Сбрасываем подкатегорию при смене категории
-watch(() => form.category, () => {
-    form.subcategory = '';
-});
-const handleSubmit = () => {
-    form.post(route('user.ads.store', user.id), {
-        forceFormData: true,
-        onSuccess: () => {
-            toast.success('Объявление успешно создано', {
-                duration: 3000,
-            });
-        },
-        onError: () => {
-            toast.error('Ошибка при создании объявления', {
-                duration: 5000,
-            });
-        }
-    });
-};
+// Обработчики
+const handleSubmit = () => submitCreate(user.id)
+const handleSaveAsDraft = () => saveAsDraft(user.id)
+const handlePublish = () => publish(user.id)
 </script>
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="p-4">
             <Card>
-                <CardContent class="space-y-4">
-                    <form @submit.prevent="handleSubmit" class="space-y-4">
-                        <div>
-                            <Label for="title" class="mb-1 block text-sm font-medium">Заголовок</Label>
-                            <Input id="title" v-model="form.title" type="text"/>
-                            <InputError :message="form.errors.title" />
+                <CardContent class="p-6">
+                    <form @submit.prevent="handleSubmit" class="space-y-6">
+                        <!-- Основная информация -->
+                        <div class="space-y-4">
+                            <h2 class="text-lg font-semibold text-foreground">Основная информация</h2>
+
+                            <FormField
+                                label="Заголовок"
+                                v-model="form.title"
+                                :error="form.errors.title"
+                                placeholder="Введите заголовок объявления"
+                                required
+                            />
+
+                            <FormField
+                                label="Описание"
+                                v-model="form.description"
+                                type="textarea"
+                                :error="form.errors.description"
+                                placeholder="Опишите товар или услугу подробно"
+                                hint="Чем подробнее описание, тем больше заинтересованных покупателей"
+                                required
+                            />
                         </div>
 
-                        <div>
-                            <Label for="description" class="mb-1 block text-sm font-medium">Описание</Label>
-                            <Textarea id="description" v-model="form.description" type="text"/>
-                            <InputError :message="form.errors.description" />
-                        </div>
+                        <!-- Категории -->
+                        <div class="space-y-4">
+                            <h2 class="text-lg font-semibold text-foreground">Категория</h2>
 
-                        <div class="flex gap-4">
-                            <div class="flex-1">
-                                <Label for="price" class="mb-1 block text-sm font-medium">Цена</Label>
-                                <Input id="price" v-model="form.price" type="number" step="0.01" min="0" />
-                                <InputError :message="form.errors.price" />
-                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Тип объявления -->
+                                <div>
+                                    <label class="text-sm font-medium text-foreground mb-2 block">
+                                        Тип объявления <span class="text-destructive">*</span>
+                                    </label>
+                                    <Select v-model="form.type" required>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Выберите тип объявления" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem
+                                                v-for="option in getAdTypes"
+                                                :key="option.value"
+                                                :value="option.value"
+                                            >
+                                                {{ option.label }}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <p v-if="form.errors.type" class="text-sm text-destructive mt-1">{{ form.errors.type }}</p>
+                                    <!-- Описание выбранного типа снизу -->
+                                    <div
+                                        v-if="form.type"
+                                        class="text-xs text-muted-foreground mt-1 min-h-[20px]"
+                                    >
+                                        {{ getAdTypes.find(t => t.value === form.type)?.description }}
+                                    </div>
+                                </div>
 
-                            <div class="flex-1">
-                                <Label for="status" class="mb-1 block text-sm font-medium">Статус</Label>
-                                <Select v-model="form.status">
-                                    <SelectTrigger class="w-full">
-                                        <SelectValue placeholder="Выберите статус" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem
-                                            v-for="option in AD_STATUS_OPTIONS"
-                                            :key="option.value"
-                                            :value="option.value"
-                                        >
-                                            {{ option.label }}
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <InputError :message="form.errors.status" />
-                            </div>
-                        </div>
+                                <!-- Категория -->
+                                <div>
+                                    <label class="text-sm font-medium text-foreground mb-2 block">Категория</label>
+                                    <Select v-model="form.category" :disabled="!form.type">
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Выберите категорию" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem
+                                                v-for="[key, category] in Object.entries(availableCategories)"
+                                                :key="key"
+                                                :value="key"
+                                            >
+                                                {{ category.label }}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <p v-if="form.errors.category" class="text-sm text-destructive mt-1">{{ form.errors.category }}</p>
+                                </div>
 
-                        <div class="flex gap-4">
-                            <div class="flex-1">
-                                <Label for="type" class="mb-1 block text-sm font-medium">Тип объявления</Label>
-                                <Select v-model="form.type">
-                                    <SelectTrigger class="w-full">
-                                        <SelectValue placeholder="Выберите тип объявления" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem
-                                            v-for="option in AD_TYPES"
-                                            :key="option.value"
-                                            :value="option.value"
-                                        >
-                                            <div class="flex flex-col">
-                                                <span>{{ option.label }}</span>
-                                            </div>
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <InputError :message="form.errors.type" />
-                                <div
-                                    v-if="form.type"
-                                    class="text-xs text-muted-foreground mt-1 min-h-[20px]"
-                                >
-                                    {{ AD_TYPES.find(t => t.value === form.type)?.description }}
+                                <!-- Подкатегория -->
+                                <div>
+                                    <label class="text-sm font-medium text-foreground mb-2 block">Подкатегория</label>
+                                    <Select v-model="form.subcategory" :disabled="!form.category">
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Выберите подкатегорию" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem
+                                                v-for="[key, subcategory] in Object.entries(availableSubcategories)"
+                                                :key="key"
+                                                :value="key"
+                                            >
+                                                {{ subcategory.label }}
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <p v-if="form.errors.subcategory" class="text-sm text-destructive mt-1">{{ form.errors.subcategory }}</p>
                                 </div>
                             </div>
-
-                            <div class="flex-1">
-                                <Label for="category" class="mb-1 block text-sm font-medium">Категория</Label>
-                                <Select v-model="form.category" :disabled="!form.type">
-                                    <SelectTrigger class="w-full">
-                                        <SelectValue placeholder="Выберите категорию" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem
-                                            v-for="option in availableCategories"
-                                            :key="option.value"
-                                            :value="option.value"
-                                        >
-                                            {{ option.label }}
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <InputError :message="form.errors.category" />
-                            </div>
-
-                            <div class="flex-1">
-                                <Label for="subcategory" class="mb-1 block text-sm font-medium">Подкатегория</Label>
-                                <Select v-model="form.subcategory" :disabled="!form.category">
-                                    <SelectTrigger class="w-full">
-                                        <SelectValue placeholder="Выберите подкатегорию" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem
-                                            v-for="option in availableSubcategories"
-                                            :key="option.value"
-                                            :value="option.value"
-                                        >
-                                            {{ option.label }}
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <InputError :message="form.errors.subcategory" />
-                            </div>
                         </div>
 
-                        <div>
-                            <Label for="location" class="mb-1 block text-sm font-medium">Местоположение</Label>
-                            <Input id="location" v-model="form.location" type="text"/>
-                            <InputError :message="form.errors.location" />
+                        <!-- Цена и местоположение -->
+                        <div class="space-y-4">
+                            <h2 class="text-lg font-semibold text-foreground">Цена и местоположение</h2>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    label="Цена"
+                                    v-model="form.price"
+                                    type="number"
+                                    :error="form.errors.price"
+                                    placeholder="0"
+                                    hint="Оставьте пустым, если цена договорная"
+                                    step="0.01"
+                                    min="0"
+                                />
+
+                                <FormField
+                                    label="Местоположение"
+                                    v-model="form.location"
+                                    :error="form.errors.location"
+                                    placeholder="Город, район"
+                                    hint="Укажите где находится товар или оказываются услуги"
+                                />
+                            </div>
                         </div>
 
                         <!-- Характеристики -->
-                        <div>
+                        <div class="space-y-4">
+                            <h2 class="text-lg font-semibold text-foreground">Характеристики</h2>
                             <FeaturesSelector
                                 v-model="form.features"
                                 :category="form.category"
                                 :max-features="5"
                             />
-                            <InputError :message="form.errors.features" />
+                            <p v-if="form.errors.features" class="text-sm text-destructive">{{ form.errors.features }}</p>
                         </div>
 
-                        <div>
-                            <Label for="images" class="mb-1 block text-sm font-medium">Изображения</Label>
+                        <!-- Изображения -->
+                        <div class="space-y-4">
+                            <h2 class="text-lg font-semibold text-foreground">Изображения</h2>
                             <ImagePreviewUploader v-model="form.images" />
+                            <p v-if="form.errors.images" class="text-sm text-destructive">{{ form.errors.images }}</p>
                         </div>
 
-                        <div class="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                id="is_urgent"
-                                v-model="form.is_urgent"
-                                class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                            />
-                            <Label for="is_urgent" class="text-sm font-medium">Срочное объявление</Label>
+                        <!-- Дополнительные параметры -->
+                        <div class="space-y-4">
+                            <h2 class="text-lg font-semibold text-foreground">Дополнительные параметры</h2>
+
+                            <div class="flex items-center space-x-2">
+                                <Checkbox
+                                    id="is_urgent"
+                                    v-model="form.is_urgent"
+                                />
+                                <label for="is_urgent" class="text-sm font-medium cursor-pointer">
+                                    Срочное объявление
+                                </label>
+                            </div>
                         </div>
 
-                        <Button type="submit" :disabled="form.processing">Создать</Button>
+                        <!-- Кнопки действий -->
+                        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                @click="handleSaveAsDraft"
+                                :disabled="form.processing || !isFormValid"
+                                class="flex-1 sm:flex-none"
+                            >
+                                Сохранить как черновик
+                            </Button>
+
+                            <Button
+                                type="button"
+                                @click="handlePublish"
+                                :disabled="form.processing || !isFormValid"
+                                class="flex-1 sm:flex-none"
+                            >
+                                Опубликовать
+                            </Button>
+                        </div>
                     </form>
                 </CardContent>
             </Card>

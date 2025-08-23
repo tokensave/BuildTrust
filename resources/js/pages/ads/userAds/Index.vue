@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import UserAdCard from '@/components/ads/UserAdCard.vue';
+import UserAdCard from '@/features/ads/components/cards/UserAdCard.vue'
 import { type SharedData, type BreadcrumbItem, type User } from '@/types';
 import { CirclePlus } from 'lucide-vue-next';
 
