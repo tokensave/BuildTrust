@@ -4,7 +4,6 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import { Trash2 } from 'lucide-vue-next';
 import type { SharedData, User } from '@/types';
 import { toast } from 'vue-sonner';
-import FeaturesDisplay from '@/components/FeaturesDisplay.vue';
 
 // Получаем авторизованного пользователя из глобальных пропсов
 const page = usePage<SharedData>();
@@ -54,8 +53,9 @@ function deleteAd() {
     if (confirm('Вы уверены, что хотите удалить объявление?')) {
         router.delete(route('user.ads.destroy', { user: user.id, ad: props.ad.id }), {
             preserveScroll: true,
+            preserveState: false,
             onSuccess: () => {
-                router.reload({ only: ['ads'] });
+                toast.success('Объявление успешно удалено');
             },
             onError: () => {
                 toast.error('Невозможно удалить объявление при наличии незакрытых сделок.')
@@ -108,12 +108,12 @@ function deleteAd() {
             <!-- Информация при наведении -->
             <div class="absolute inset-0 flex flex-col justify-end bg-black/50 p-4 text-white opacity-0 transition-opacity group-hover:opacity-100">
                 <CardTitle class="mb-2">{{ props.ad.title }}</CardTitle>
-                
+
                 <!-- Категории -->
                 <div v-if="props.ad.formatted_category" class="text-xs text-gray-300 mb-1">
                     {{ props.ad.formatted_category }}
                 </div>
-                
+
                 <!-- Местоположение и цена -->
                 <div class="flex justify-between items-center mb-2 text-sm">
                     <span v-if="props.ad.location" class="text-gray-300">
@@ -126,16 +126,16 @@ function deleteAd() {
                         Договорная
                     </span>
                 </div>
-                
+
                 <CardDescription class="text-gray-200 text-sm">
                     {{ props.ad.description }}
                 </CardDescription>
-                
+
                 <!-- Характеристики -->
                 <div class="mt-2">
                     <div v-if="props.ad.features && props.ad.features.length > 0" class="flex flex-wrap gap-1">
-                        <span 
-                            v-for="feature in props.ad.features.slice(0, 3)" 
+                        <span
+                            v-for="feature in props.ad.features.slice(0, 3)"
                             :key="feature"
                             class="bg-white/20 text-white px-2 py-0.5 rounded text-xs"
                         >

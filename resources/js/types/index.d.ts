@@ -4,7 +4,6 @@ import type { Config } from 'ziggy-js';
 import type { AD_TYPES, ALL_CATEGORIES, SUBCATEGORIES_BY_CATEGORY, AD_STATUS_OPTIONS } from './ad-enums';
 
 
-
 export interface Auth {
     user: User;
 }
@@ -92,11 +91,6 @@ export interface AdType {
     description: string;
 }
 
-export interface AdCategory {
-    value: string;
-    label: string;
-}
-
 export interface AdSubcategory {
     value: string;
     label: string;
@@ -131,7 +125,6 @@ export interface Company {
     website: string;
     verified: boolean;
 }
-
 
 export interface Deal {
     id: number;

@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import type { Ad, Company, User } from '@/types';
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import AdGalleryModal from '@/components/AdGalleryModal.vue';
+import AdGalleryModal from '@/components/ads/AdGalleryModal.vue';
 import CompanyCard from '@/components/company/CompanyCard.vue';
 import DealCreateModal from '@/components/deal/DealCreateModal.vue';
 import { Button } from '@/components/ui/button';

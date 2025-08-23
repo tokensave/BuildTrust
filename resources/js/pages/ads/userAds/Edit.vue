@@ -18,7 +18,7 @@ import {
     SUBCATEGORIES_BY_CATEGORY,
     AD_STATUS_OPTIONS
 } from '@/types/ad-enums';
-import FeaturesSelector from '@/components/FeaturesSelector.vue';
+import FeaturesSelector from '@/components/ads/FeaturesSelector.vue';
 
 const page = usePage<SharedData & { ad: Ad }>();
 const user = page.props.auth.user as User;

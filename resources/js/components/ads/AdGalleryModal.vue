@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, defineProps, defineEmits } from 'vue';
+import { X, ChevronRight, ChevronLeft } from 'lucide-vue-next'
 
 const props = defineProps<{
     images: string[];
@@ -34,33 +35,36 @@ const currentImage = computed(() =>
             />
 
             <!-- Кнопка закрытия -->
-            <button
+            <Button
                 @click="emit('close')"
+                variant="ghost"
+                size="icon"
                 class="absolute top-2 right-2 text-white text-3xl font-bold bg-red-600 rounded-full w-8 h-8 flex items-center justify-center"
                 aria-label="Закрыть"
             >
-                ×
-            </button>
+                <X />
+            </Button>
 
             <!-- Кнопка назад -->
-            <button
+            <Button
                 v-if="props.index !== null && props.index > 0"
                 @click="emit('prev')"
+                size="icon"
                 class="absolute left-2 text-white text-4xl font-bold bg-black/50 rounded px-2 py-1"
-                aria-label="Предыдущее"
-            >
-                ‹
-            </button>
+                aria-label="Предыдущее">
+                <ChevronLeft />
+            </Button>
 
             <!-- Кнопка вперёд -->
-            <button
+            <Button
                 v-if="props.index !== null && props.index < props.images.length - 1"
                 @click="emit('next')"
+                size="icon"
                 class="absolute right-2 text-white text-4xl font-bold bg-black/50 rounded px-2 py-1"
                 aria-label="Следующее"
             >
-                ›
-            </button>
+                <ChevronRight />
+            </Button>
         </div>
     </div>
 </template>

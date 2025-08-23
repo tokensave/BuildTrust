@@ -103,7 +103,11 @@ class UserAdsController extends Controller
      */
     public function destroy(int $user, Ad $ad, AdService $service)
     {
-        abort_if($service->checkDeal($ad), 403, 'Невозможно удалить объявление при наличии незакрытых сделок.');
+        if ($service->checkDeal($ad)) {
+            return redirect()->back()->withErrors([
+                'deal_exists' => 'Невозможно удалить объявление при наличии незакрытых сделок.'
+            ]);
+        }
 
         $service->delete($ad);
 
