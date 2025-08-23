@@ -6,6 +6,8 @@ use App\Enums\AdEnums\AdCategoryEnum;
 use App\Enums\AdEnums\AdSubcategoryEnum;
 use App\Enums\AdEnums\AdTypeEnum;
 use App\Enums\AdEnums\AdFeaturesEnum;
+use App\Enums\AdEnums\AdsStatusEnum;
+use App\Enums\DealEnums\DealStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Services\Ad\AdService;
 use Illuminate\Http\JsonResponse;
@@ -138,5 +140,41 @@ class FilterController extends Controller
         } catch (\ValueError $e) {
             return response()->json(['error' => 'Invalid category'], 400);
         }
+    }
+
+    /**
+     * Получить все enum'ы разом для инициализации фронтенда
+     */
+    public function getAllEnums(): JsonResponse
+    {
+        return response()->json([
+            'adStatuses' => collect(AdsStatusEnum::cases())->map(fn($case) => [
+                'value' => $case->value,
+                'label' => $case->label(),
+                'color' => $this->getAdStatusColor($case)
+            ])->values(),
+            
+            'adTypes' => AdTypeEnum::toArray(),
+            
+            'dealStatuses' => collect(DealStatusEnum::cases())->map(fn($case) => [
+                'value' => $case->value,
+                'label' => $case->label(),
+                'color' => $case->color()
+            ])->values(),
+            
+            'categories_structure' => AdSubcategoryEnum::toArrayGrouped()
+        ]);
+    }
+
+    /**
+     * Получить цвет статуса объявления
+     */
+    private function getAdStatusColor(AdsStatusEnum $status): string
+    {
+        return match($status) {
+            AdsStatusEnum::DRAFT => 'bg-yellow-100 text-yellow-800',
+            AdsStatusEnum::PUBLISHED => 'bg-green-100 text-green-800', 
+            AdsStatusEnum::ARCHIVED => 'bg-gray-100 text-gray-800',
+        };
     }
 }

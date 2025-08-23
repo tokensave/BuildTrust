@@ -4,11 +4,12 @@ import { Head, usePage, router } from '@inertiajs/vue3';
 import { Table, TableRow, TableCell, TableHeader, TableHead, TableBody } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { computed, ref } from 'vue';
-import AdGalleryModal from '@/components/AdGalleryModal.vue';
-import FeaturesDisplay from '@/components/FeaturesDisplay.vue';
-import AdFilters from '@/components/AdFilters.vue';
+import AdGalleryModal from '@/features/ads/components/modals/AdGalleryModal.vue'
+import FeaturesDisplay from '@/features/ads/components/display/FeaturesDisplay.vue'
+import AdFilters from '@/features/ads/components/forms/AdFilters.vue'
 import type { Ad, SharedData, User, AdFilter, Paginated } from '@/types';
-import AdPagination from '@/components/ads/AdPagination.vue';
+import AdPagination from '@/features/ads/components/navigation/AdPagination.vue';
+import { truncateText } from '@/composables/useInitials';
 
 const page = usePage<SharedData & { ads: Paginated<Ad>, filters?: AdFilter }>(); // Используем общий тип
 const ads = computed(() => page.props.ads.data); // Теперь берем data из пагинации
@@ -50,7 +51,6 @@ const prevImage = () => {
     }
 };
 
-
 const handlePageChange = (pageNumber: number) => {
     const params = {
         ...filters.value,
@@ -61,12 +61,6 @@ const handlePageChange = (pageNumber: number) => {
         preserveState: true,
         preserveScroll: true,
     });
-};
-
-const truncateText = (text: string, length: number): string => {
-    if (!text) return '';
-    if (text.length <= length) return text;
-    return text.slice(0, length).trim() + '...';
 };
 
 </script>

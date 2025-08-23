@@ -12,3 +12,10 @@ export function getInitials(fullName?: string): string {
 export function useInitials() {
     return { getInitials };
 }
+
+export function truncateText(text: string, length: number): string {
+    if (!text) return '';
+    if (text.length <= length) return text;
+    return text.slice(0, length).trim() + '...';
+}
+

@@ -20,6 +20,7 @@ Route::prefix('filters')->group(function () {
     Route::get('structure', [FilterController::class, 'getAllStructure'])->name('api.filters.structure');
     Route::get('locations', [FilterController::class, 'getPopularLocations'])->name('api.filters.locations');
     Route::get('features', [FilterController::class, 'getFeaturesByCategory'])->name('api.filters.features');
+    Route::get('all-enums', [FilterController::class, 'getAllEnums'])->name('api.filters.all-enums');
 });
 
 // AI маршруты

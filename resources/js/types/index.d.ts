@@ -1,10 +1,13 @@
 import type { PageProps } from '@inertiajs/core';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
-import type { AD_TYPES, ALL_CATEGORIES, SUBCATEGORIES_BY_CATEGORY, AD_STATUS_OPTIONS } from './ad-enums';
 
+// Реэкспорт типов из features для обратной совместимости
+export type { Ad, AdStatus, AdType, AdCategory, AdFilters } from '@/features/ads/types/ad';
+export type { Deal, DealStatus, StatusConfig } from '@/features/deals/types/deal';
+export type { Thread, Message } from '@/features/chat/types/chat';
 
-
+// Глобальные интерфейсы приложения
 export interface Auth {
     user: User;
 }
@@ -41,86 +44,6 @@ export interface User {
     company?: Company;
 }
 
-// Добавьте типы
-export type AdTypeOption = typeof AD_TYPES[number];
-export type AdCategoryOption = typeof ALL_CATEGORIES[number];
-export type AdStatusOption = typeof AD_STATUS_OPTIONS[number];
-export type AdSubCategoryOption = typeof SUBCATEGORIES_BY_CATEGORY[number];
-export interface Ad {
-    id: number;
-    title: string;
-    type: string;
-    category?: string;
-    subcategory?: string;
-    location?: string;
-    description: string;
-    price: number;
-    is_urgent: boolean;
-    features?: string[];
-    slug: string;
-    status: string;
-    user_id: number;
-    formatted_category?: string; // Аксессор для красивого отображения категорий
-    is_service: boolean; // Аксессор для проверки типа
-    created_at: string;
-    updated_at: string;
-    media?: {
-        original_url: string;
-    }[];
-    user: {
-        id: number;
-        name: string;
-        company?: Company;
-    };
-}
-
-// Типы для фильтров
-export interface AdFilter {
-    type?: string;
-    category?: string;
-    subcategory?: string;
-    location?: string;
-    min_price?: number;
-    max_price?: number;
-    urgent?: boolean;
-    search?: string;
-}
-
-export interface AdType {
-    value: string;
-    label: string;
-    description: string;
-}
-
-export interface AdCategory {
-    value: string;
-    label: string;
-}
-
-export interface AdSubcategory {
-    value: string;
-    label: string;
-}
-
-export interface Paginated<T> {
-    data: T[];
-    current_page: number;
-    last_page: number;
-    per_page: number;
-    total: number;
-    from: number | null;
-    to: number | null;
-}
-
-export interface CategoriesStructure {
-    [categoryKey: string]: {
-        label: string;
-        subcategories: {
-            [subcategoryKey: string]: AdSubcategory;
-        };
-    };
-}
-
 export interface Company {
     inn: string;
     name: string;
@@ -132,65 +55,16 @@ export interface Company {
     verified: boolean;
 }
 
-
-export interface Deal {
-    id: number;
-    ad_id: number;
-    buyer_id: number;
-    seller_id: number;
-    price: number;
-    notes?: string;
-    status: DealStatus;
-    created_at: string;
-    documents_urls?: string[];
-    buyer: {
-        id: number;
-        name: string;
-        company?: Company;
-    };
-    seller: {
-        id: number;
-        name: string;
-        company?: Company;
-    };
-    ad_title: string;
+// Утилитарные типы
+export interface Paginated<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number | null;
+    to: number | null;
 }
 
-export interface StatusConfig {
-    value: DealStatus;
-    label: string;
-    color: string;
-}
-
-export type DealStatus = 'pending' | 'accepted' | 'rejected' | 'completed' | 'canceled';
-
-export interface Thread {
-    id: number;
-    ad: Ad;
-    messages: Message[];
-    participants: Array<{
-        id: number;
-        username: string;
-        email: string;
-    }>;
-    latest_message: {
-        content: string;
-        created_at: string;
-        author_id: number;
-    } | null;
-}
-
-export interface Message {
-    id: number;
-    content: string;
-    created_at: string;
-    author_id: number;
-    thread_id: number;
-    author: {
-        id: number;
-        username: string;
-        email: string;
-    };
-}
-
+// Алиас для обратной совместимости
 export type BreadcrumbItemType = BreadcrumbItem;
